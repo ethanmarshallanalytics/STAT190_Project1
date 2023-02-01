@@ -45,3 +45,9 @@ ggplot(data = long_repair) +
   coord_flip()
 # Converter No subsystem (Converter) and Converter Cooling System tied for most
 # Transmission Cooling System in second
+
+
+# find the most frequently repaired component for each Turbine
+filter_wo %>% 
+  filter(., location_id == 'Turbine 1') %>% # filter to a specific Turbine
+  ggplot(data = .) + geom_bar(aes(x = component_type)) + coord_flip() #plot histogram of component_types
