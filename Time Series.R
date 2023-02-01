@@ -23,3 +23,6 @@ for (file in sensor_files[-1]) {
 
 # Write the combined data to a file
 write.csv(combined_data, "Fault Codes Time Series/combined_data.csv")
+
+# Changing Column Names
+colnames(combined_data)[1] <- "location_id"
