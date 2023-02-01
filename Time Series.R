@@ -5,18 +5,7 @@ library(tidyverse)
 library(lubridate)
 library(readr)
 
-
-## Should be an easy for loop to add in all of the sensor_files and append them 
-sensor_files = list.files("Fault Codes Time Series/Fault Codes Time Series")
-sensor_files
-
-# notice the first row is the column headers - you'll probably want to use header=FALSE in read.csv
-
-for(i in 1:length(sensor_files)) {
-  s2 = read.csv(header = FALSE, paste0("Fault Codes Time Series/Fault Codes Time Series/", sensor_files[i]))
-}
-
-##------------------ For Loop & Append
+##------------------ For Loop & Append for Time Series Data
 sensor_files <- list.files("Fault Codes Time Series/Fault Codes Time Series")
 
 # Initialize an empty data frame to store the combined data from all files
