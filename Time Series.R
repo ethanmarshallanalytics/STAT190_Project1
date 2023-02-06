@@ -7,7 +7,7 @@ library(readr)
 
 ##------------------ For Loop & Append for Time Series Data
 sensor_files <- list.files("Fault Codes Time Series/Fault Codes Time Series")
-
+sensor_files
 # Initialize an empty data frame to store the combined data from all files
 combined_data <- data.frame()
 
