@@ -23,7 +23,7 @@ for (file in sensor_files_1[-1]) {
 }
 
 # Write the combined data to a file
-write.csv(combined_data_1, "Gearbox HS Bearing Temp Part 1/combined_data_1.csv")
+write.csv(combined_data_1, "Gearbox HS Bearing Temp Part 1/gearbox_1.csv")
 
 
 ## ------------------------------------------Gearbox Bearing Part 2
@@ -43,7 +43,7 @@ for (file in sensor_files_2[-1]) {
 }
 
 # Write the combined data to a file
-write.csv(combined_data_2, "Gearbox HS Bearing Temp Part 2/combined_data_2.csv")
+write.csv(combined_data_2, "Gearbox HS Bearing Temp Part 2/gearbox_2.csv")
 
 
 ## ------------------------------------------Gearbox Bearing Part 3
@@ -63,7 +63,7 @@ for (file in sensor_files_3[-1]) {
 
 
 # Write the combined data to a file
-write.csv(combined_data_3, "Gearbox HS Bearing Temp Part 3/combined_data_3.csv")
+write.csv(combined_data_3, "Gearbox HS Bearing Temp Part 3/gearbox_3.csv")
 
 ## ------------------------------------------Gearbox Oil Temp
 sensor_files_4 <- list.files("Gearbox Oil Temperature/Gearbox Oil Temperature")
@@ -82,4 +82,23 @@ for (file in sensor_files_4[-1]) {
 
 
 # Write the combined data to a file
-write.csv(combined_data_4, "Gearbox Oil Temperature/combined_data_4.csv")
+write.csv(combined_data_4, "Gearbox Oil Temperature/gearbox_oil_temp.csv")
+
+## ------------------------ Windspeed
+wind_files <- list.files("Project1Data/Windspeed")
+wind_files
+
+wind_data <- data.frame()
+
+# Loop through the list of files
+for (file in wind_files[-1]) {
+  
+  
+  data <- read.csv(paste0("Project1Data/Windspeed/", file), header = FALSE)
+  
+  # Append the data to the combined_data data frame
+  wind_data <- rbind(wind_data, data)
+}
+
+# Write the combined data to a file
+write.csv(combined_data_4, "Project1Data/windspeed.csv")
