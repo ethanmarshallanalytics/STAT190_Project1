@@ -1,4 +1,4 @@
-# Active Power Scrap
+# Generator RPM download
 
 rpm_files <- list.files("Project1Data/Generator RPM")
 rpm_files
