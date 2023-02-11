@@ -21,7 +21,7 @@ wind_7 <- wind %>% filter(V1 == "Turbine 7")
 oil_temp_7 <- oil_temp %>% filter(V1 == "Turbine 7")
 fc_7 <- fc %>% filter(V1 == "Turbine 7")
 rpm_7 <- rpm %>% filter(V1 == "Turbine 7")
-wo_7 <- wo %>% filter(location_id == "Turbine 7")
+wo_7 <- wo %>% filter(location_id == "Turbine 7" & component_type != "null")
 g1_7 <- g1 %>% filter(V1 == "Turbine 7")
 g2_7 <- g2 %>% filter(V1 == "Turbine 7")
 
@@ -40,9 +40,11 @@ df1 <- fc_7 %>%
     left_join(wind_7, by=c("V2"="V2")) %>%
     left_join(gearbox_7, by=c("V2"="V2"))
 
+# remove unnecessary columns
 df1 = subset(df1, select = -c(X.x, X.y, V1.y, V3.y, X.x.x, V1.x.x, V3.x.x, 
                               X.y.y, V1.y.y, V3.y.y, X, V1, V3))
 
+# rename remaining columns to something meaningful
 df1 <- df1 %>%
     rename("Turbine" = "V1.x",
            "Datetime" = "V2",
@@ -60,5 +62,13 @@ df1 <- df1 %>%
            "Gearbox_Number" = "V4", # ASK ABOUT THIS ... WHAT DOES THIS NUMBER MEAN?
            "Gearbox_Type" = "V5")
 
+# only return distinct columns
+df1 <- distinct(df1)
+
+# look at data tables
+View(df1)
+View(wo_7)
+
 # filter out null rows for oil_temp, rpm, and gearbox
-full_df1 <- df1 %>% filter(!is.na(Oil_Temp) & !is.na(Generator_RPM) & !is.na(Gearbox_Number))
+## NOTE: MAY NOT WANT TO DO THIS TO KEEP ALL RAW DATA
+# df1 <- df1 %>% filter(!is.na(Oil_Temp) & !is.na(Generator_RPM) & !is.na(Gearbox_Number))
