@@ -35,10 +35,30 @@ ggplot(data = wind_7) +
 
 # join fault code data to other data sets
 df1 <- fc_7 %>% 
-    left_join(oil_temp_7, by=c('V2'='V2')) %>% 
+    left_join(oil_temp_7, by=c("V2"="V2")) %>% 
     left_join(rpm_7, by=c("V2"="V2")) %>%
     left_join(wind_7, by=c("V2"="V2")) %>%
     left_join(gearbox_7, by=c("V2"="V2"))
 
+df1 = subset(df1, select = -c(X.x, X.y, V1.y, V3.y, X.x.x, V1.x.x, V3.x.x, 
+                              X.y.y, V1.y.y, V3.y.y, X, V1, V3))
+
+df1 <- df1 %>%
+    rename("Turbine" = "V1.x",
+           "Datetime" = "V2",
+           "Date" = "V3.x",
+           "Fault_Code" = "V4.x",
+           "Status" = "V5.x",
+           "Fault_Description" = "V6",
+           "Fault_Type" = "V7",
+           "Oil_Temp" = "V4.y", 
+           "Oil_Type" = "V5.y",
+           "Generator_RPM" = "V4.x.x", 
+           "RPM_Type" = "V5.x.x",
+           "Wind_Speed" = "V4.y.y",
+           "Wind_Type" = "V5.y.y",
+           "Gearbox_Number" = "V4", # ASK ABOUT THIS ... WHAT DOES THIS NUMBER MEAN?
+           "Gearbox_Type" = "V5")
+
 # filter out null rows for oil_temp, rpm, and gearbox
-full_df1 <- df1 %>% filter(!is.na(V1.x.x) & !is.na(V1.y) & !is.na(V1))
+full_df1 <- df1 %>% filter(!is.na(Oil_Temp) & !is.na(Generator_RPM) & !is.na(Gearbox_Number))
