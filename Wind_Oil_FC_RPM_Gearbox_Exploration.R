@@ -28,10 +28,21 @@ g2_7 <- g2 %>% filter(V1 == "Turbine 7")
 # combine gearbox data together  
 gearbox_7 <- rbind(g1_7, g2_7)
 
-# histogram of dates for wind data (smallest dataset)
+# histogram of windspeed data (smallest dataset)
 ggplot(data = wind_7) + 
-  geom_bar(aes(x=V3)) + coord_flip()
-# 2.5 years of data, all through summer and winter. Appear to be well distributed
+  geom_histogram(aes(x=V4), bins = 60) + xlab("Windspeed") + ylab("Frequency")
+
+# histogram of oil temperatures
+ggplot(data = oil_temp_7) +
+  geom_bar(aes(x=V4)) + xlab("Oil Temperature") + ylab("Frequency")
+
+# histogram of generator RPM
+ggplot(data = rpm_7) +
+  geom_histogram(aes(x=V4), bins= 100) + xlab("Generator RPM") + ylab("Frequency")
+
+# histogram of gearbox data
+ggplot(data = gearbox_7) +
+  geom_histogram(aes(x=V4), bins= 60) + xlab("Gearbox Number") + ylab("Frequency")
 
 # join fault code data to other data sets
 df1 <- fc_7 %>% 
