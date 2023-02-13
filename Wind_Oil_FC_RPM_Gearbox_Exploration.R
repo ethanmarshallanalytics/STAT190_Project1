@@ -1,6 +1,7 @@
 rm(list = ls())
 library(dplyr)
 library(tidyverse)
+library(forcats)
 
 # read in windspeed.csv
 wind <- read.csv("Project1Data/windspeed.csv")
@@ -83,3 +84,15 @@ View(wo_7)
 # filter out null rows for oil_temp, rpm, and gearbox
 ## NOTE: MAY NOT WANT TO DO THIS TO KEEP ALL RAW DATA
 # df1 <- df1 %>% filter(!is.na(Oil_Temp) & !is.na(Generator_RPM) & !is.na(Gearbox_Number))
+
+#----- Analyzing the lead up to 06/05/2020 Work Order: Converter Controller - Reapired
+head(wo_7,1)
+df1$dates = as.Date(df1$Date) #Change from Character to Date
+# New Data frame looking at Fault Codes from 05/22/2020 - 06/05/2020
+df2 = subset(df1, Date < as.Date("2020-06-05") & Date > as.Date("2020-05-22"))
+table(df2$Fault_Code)
+
+ggplot(data = df2) +
+  geom_bar(aes(x=fct_infreq(Fault_Description))) + xlab("Fault Description") + ylab("Frequency") +
+  labs(x = "Fault_Description")+
+  coord_flip()
