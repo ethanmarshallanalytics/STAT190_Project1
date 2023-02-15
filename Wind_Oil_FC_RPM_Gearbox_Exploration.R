@@ -26,7 +26,7 @@ wo_7 <- wo %>% filter(location_id == "Turbine 7" & component_type != "null")
 g1_7 <- g1 %>% filter(V1 == "Turbine 7")
 g2_7 <- g2 %>% filter(V1 == "Turbine 7")
 
-# combine gearbox data together  
+# combine gearbox data together
 gearbox_7 <- rbind(g1_7, g2_7)
 
 # histogram of windspeed data (smallest dataset)
@@ -43,7 +43,7 @@ ggplot(data = rpm_7) +
 
 # histogram of gearbox data
 ggplot(data = gearbox_7) +
-  geom_histogram(aes(x=V4), bins= 60) + xlab("Gearbox Number") + ylab("Frequency")
+  geom_histogram(aes(x=V4), bins= 60) + xlab("Gearbox Temp") + ylab("Frequency")
 
 # join fault code data to other data sets
 df1 <- fc_7 %>% 
@@ -71,7 +71,7 @@ df1 <- df1 %>%
            "RPM_Type" = "V5.x.x",
            "Wind_Speed" = "V4.y.y",
            "Wind_Type" = "V5.y.y",
-           "Gearbox_Number" = "V4", # ASK ABOUT THIS ... WHAT DOES THIS NUMBER MEAN?
+           "Gearbox_Temp" = "V4",
            "Gearbox_Type" = "V5")
 
 # only return distinct columns
