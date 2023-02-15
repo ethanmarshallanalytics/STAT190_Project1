@@ -23,23 +23,33 @@ ap <- read.csv("Project1Data/active_power.csv")
 # filter data to only include Turbine 7
 wind_7 <- wind %>% filter(V1 == "Turbine 7")
 oil_temp_7 <- oil_temp %>% filter(V1 == "Turbine 7")
-fc_7 <- fc %>% filter(V1 == "Turbine 7")
 rpm_7 <- rpm %>% filter(V1 == "Turbine 7")
-wo_7 <- wo %>% filter(location_id == "Turbine 7" & component_type != "null")
 g1_7 <- g1 %>% filter(V1 == "Turbine 7")
 g2_7 <- g2 %>% filter(V1 == "Turbine 7")
 ap_7 <- ap %>% filter(V1 == "Turbine 7")
-
-# change V2 to datetime
-wind_7$V2 <- ymd_hms(wind_7$V2)
-
-# aggregate timestamp to every 10 minute interval
-wind_7$V2 <- round_date(wind_7$V2, "10 minute")
+fc_7 <- fc %>% filter(V1 == "Turbine 7")
+wo_7 <- wo %>% filter(location_id == "Turbine 7" & component_type != "null")
 
 
+# convert datetime in fault codes and aggregate fault code times
+fc_7$V2 <- ymd_hms(fc_7$V2)
+fc_7$Round_Time <- round_date(fc_7$V2, "10 minute")
 
+# function to change data types, group on 10 minute intervals, and find average value
+# TODO: group on turbine when scaled up
+grouping <- function(data){
+  data$V2 <- ymd_hms(data$V2)
+  data$Round_Time <- round_date(data$V2, "10 minute")
+  data <- data %>% group_by(Round_Time) %>% summarise(Avg_Value = mean(V4, na.rm=TRUE))
+}
 
-
+# call functions on each dataset
+wind_7 = grouping(wind_7)
+oil_temp_7 = grouping(oil_temp_7)
+rpm_7 = grouping(rpm_7)
+g1_7 = grouping(g1_7)
+g2_7 = grouping(g2_7)
+ap_7 = grouping(ap_7)
 
 
 # combine gearbox data together
