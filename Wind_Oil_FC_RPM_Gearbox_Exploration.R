@@ -16,6 +16,8 @@ wo <- read.csv("Project1Data/work order scrubbed.csv")
 # read in gearbox 1 and 2 data
 g1 <- read.csv("Project1Data/gearbox_1.csv")
 g2 <- read.csv("Project1Data/gearbox_2.csv")
+# read in active power data
+ap <- read.csv("Project1Data/active_power.csv")
 
 # filter data to only include Turbine 7
 wind_7 <- wind %>% filter(V1 == "Turbine 7")
@@ -25,6 +27,7 @@ rpm_7 <- rpm %>% filter(V1 == "Turbine 7")
 wo_7 <- wo %>% filter(location_id == "Turbine 7" & component_type != "null")
 g1_7 <- g1 %>% filter(V1 == "Turbine 7")
 g2_7 <- g2 %>% filter(V1 == "Turbine 7")
+ap_7 <- ap %>% filter(V1 == "Turbine 7")
 
 # combine gearbox data together
 gearbox_7 <- rbind(g1_7, g2_7)
