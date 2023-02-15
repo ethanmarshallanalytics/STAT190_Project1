@@ -2,6 +2,7 @@ rm(list = ls())
 library(dplyr)
 library(tidyverse)
 library(forcats)
+library(lubridate)
 
 # read in windspeed.csv
 wind <- read.csv("Project1Data/windspeed.csv")
@@ -28,6 +29,18 @@ wo_7 <- wo %>% filter(location_id == "Turbine 7" & component_type != "null")
 g1_7 <- g1 %>% filter(V1 == "Turbine 7")
 g2_7 <- g2 %>% filter(V1 == "Turbine 7")
 ap_7 <- ap %>% filter(V1 == "Turbine 7")
+
+# change V2 to datetime
+wind_7$V2 <- ymd_hms(wind_7$V2)
+
+# aggregate timestamp to every 10 minute interval
+wind_7$V2 <- round_date(wind_7$V2, "10 minute")
+
+
+
+
+
+
 
 # combine gearbox data together
 gearbox_7 <- rbind(g1_7, g2_7)
