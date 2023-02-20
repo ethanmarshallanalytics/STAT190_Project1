@@ -43,51 +43,41 @@ g2 = grouping(g2)
 g3 = grouping(g3)
 ap = grouping(ap)
 
-
-# filter data to only include Turbine 7
-wind_7 <- wind %>% filter(V1 == "Turbine 7")
-oil_temp_7 <- oil_temp %>% filter(V1 == "Turbine 7")
-rpm_7 <- rpm %>% filter(V1 == "Turbine 7")
-g1_7 <- g1 %>% filter(V1 == "Turbine 7")
-g2_7 <- g2 %>% filter(V1 == "Turbine 7")
-ap_7 <- ap %>% filter(V1 == "Turbine 7")
-fc_7 <- fc %>% filter(V1 == "Turbine 7")
-wo_7 <- wo %>% filter(location_id == "Turbine 7" & component_type != "null")
-
-
 # combine gearbox data together
-gearbox_7 <- rbind(g1_7, g2_7)
+gearbox <- rbind(g1, g2, g3)
 
 # join fault code data to other data sets
-df1 <- fc_7 %>% 
-    left_join(oil_temp_7, by=c("Round_Time"="Round_Time")) %>% 
-    left_join(rpm_7, by=c("Round_Time"="Round_Time")) %>%
-    left_join(wind_7, by=c("Round_Time"="Round_Time")) %>%
-    left_join(gearbox_7, by=c("Round_Time"="Round_Time")) %>%
-    left_join(ap_7, by=c("Round_Time"="Round_Time"))
+df1 <- fc %>% 
+  full_join(oil_temp, by=c("Round_Time"="Round_Time", "V1"="V1")) %>% 
+  full_join(rpm, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
+  full_join(wind, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
+  full_join(gearbox, by=c("Round_Time"="Round_Time", "V1"="V1")) 
+  # %>% left_join(ap, by=c("Round_Time"="Round_Time", "V1"="V1"))
+
+# add column to specify if a fault code occurred
+df1$If_Fault <- ifelse(df1$V6 > "", 1, 0)
 
 # remove unnecessary columns
-df1 = subset(df1, select = -c(X, V1.y, V1.x.x, V1.y.y, V1.x.x.x, V1.y.y.y))
+df1 = subset(df1, select = -c(X))
 
 # rename remaining columns to something meaningful
 df1 <- df1 %>%
-    rename("Turbine" = "V1.x",
-           "Datetime" = "V2",
-           "Date" = "V3",
-           "Fault_Code" = "V4",
-           "Status" = "V5",
-           "Fault_Description" = "V6",
-           "Fault_Type" = "V7",
-           "Oil_Temp" = "Avg_Value.x",
-           "Generator_RPM" = "Avg_Value.y",
-           "Wind_Speed" = "Avg_Value.x.x",
-           "Gearbox_Temp" = "Avg_Value.y.y",
-           "Active_Power" = "Avg_Value")
-
-# TODO: INTERPOLATE MEDIAN/MEAN FOR NULL VALUES
+  rename("Turbine" = "V1",
+         "Datetime" = "V2",
+         "Date" = "V3",
+         "Fault_Code" = "V4",
+         "Status" = "V5",
+         "Fault_Description" = "V6",
+         "Fault_Type" = "V7",
+         "Oil_Temp" = "Avg_Value.x",
+         "Generator_RPM" = "Avg_Value.y",
+         "Wind_Speed" = "Avg_Value.x.x",
+         "Gearbox_Temp" = "Avg_Value.y.y",
+         "Active_Power" = "Avg_Value")
 
 # only return distinct columns
 df1 <- distinct(df1)
+
 
 # replace missing values with mean
 df1$Oil_Temp[is.na(df1$Oil_Temp)] <- mean(df1$Oil_Temp, na.rm=TRUE)
@@ -95,6 +85,11 @@ df1$Generator_RPM[is.na(df1$Generator_RPM)] <- mean(df1$Generator_RPM, na.rm=TRU
 df1$Wind_Speed[is.na(df1$Wind_Speed)] <- mean(df1$Wind_Speed, na.rm=TRUE)
 df1$Gearbox_Temp[is.na(df1$Gearbox_Temp)] <- mean(df1$Gearbox_Temp, na.rm=TRUE)
 df1$Active_Power[is.na(df1$Active_Power)] <- mean(df1$Active_Power, na.rm=TRUE)
+
+
+
+# filter data to only include Turbine 7
+df1_7 <- df1 %>% filter(Turbine == "Turbine 7")
 
 # look at data tables
 View(df1)
@@ -128,3 +123,10 @@ ggplot(data = df2) +
   geom_bar(aes(x=fct_infreq(Fault_Description))) + xlab("Fault Description") + ylab("Frequency") +
   labs(x = "Fault_Description")+
   coord_flip()
+
+### MULTIVARIATE PLOTS
+ggplot(data = df1_7) +
+  geom_point(aes(x=Wind_Speed, y=Generator_RPM)) +
+  geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Description),"")))
+
+
