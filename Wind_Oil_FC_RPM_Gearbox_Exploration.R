@@ -43,6 +43,7 @@ g2 = grouping(g2)
 g3 = grouping(g3)
 ap = grouping(ap)
 
+
 # filter data to only include Turbine 7
 wind_7 <- wind %>% filter(V1 == "Turbine 7")
 oil_temp_7 <- oil_temp %>% filter(V1 == "Turbine 7")
@@ -87,6 +88,13 @@ df1 <- df1 %>%
 
 # only return distinct columns
 df1 <- distinct(df1)
+
+# replace missing values with mean
+df1$Oil_Temp[is.na(df1$Oil_Temp)] <- mean(df1$Oil_Temp, na.rm=TRUE)
+df1$Generator_RPM[is.na(df1$Generator_RPM)] <- mean(df1$Generator_RPM, na.rm=TRUE)
+df1$Wind_Speed[is.na(df1$Wind_Speed)] <- mean(df1$Wind_Speed, na.rm=TRUE)
+df1$Gearbox_Temp[is.na(df1$Gearbox_Temp)] <- mean(df1$Gearbox_Temp, na.rm=TRUE)
+df1$Active_Power[is.na(df1$Active_Power)] <- mean(df1$Active_Power, na.rm=TRUE)
 
 # look at data tables
 View(df1)
