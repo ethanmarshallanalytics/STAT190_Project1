@@ -55,7 +55,7 @@ df1 <- fc %>%
   full_join(ap, by=c("Round_Time"="Round_Time", "V1"="V1"))
 
 # add column to specify if a fault code occurred
-df1$If_Fault <- ifelse(df1$V6 > "", 1, 0)
+df1$Is_Fault <- ifelse(df1$V6 > "", 1, 0)
 
 # remove unnecessary columns
 df1 = subset(df1, select = -c(X))
