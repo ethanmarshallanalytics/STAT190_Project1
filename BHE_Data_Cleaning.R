@@ -58,7 +58,7 @@ df1 <- fc %>%
 df1$Is_Fault <- ifelse(df1$V6 > "", 1, 0)
 
 # remove unnecessary columns
-df1 = subset(df1, select = -c(X))
+df1 <- subset(df1, select = -c(X))
 
 # rename remaining columns to something meaningful
 df1 <- df1 %>%
@@ -74,9 +74,6 @@ df1 <- df1 %>%
          "Wind_Speed" = "Avg_Value.x.x",
          "Gearbox_Temp" = "Avg_Value.y.y",
          "Active_Power" = "Avg_Value")
-
-# only return distinct columns
-df1 <- distinct(df1)
 
 # replace missing values with mean
 df1$Oil_Temp[is.na(df1$Oil_Temp)] <- mean(df1$Oil_Temp, na.rm=TRUE)
