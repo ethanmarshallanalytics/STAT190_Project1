@@ -44,7 +44,7 @@ ggplot(data = df2) +
   labs(x = "Fault_Description")+
   coord_flip()
 
-### MULTIVARIATE PLOTS
+## MULTIVARIATE PLOTS ------------
 ggplot(data = data_7) +
   geom_point(aes(x=Wind_Speed, y=Generator_RPM)) +
   geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Description),"")))
@@ -53,6 +53,15 @@ ggplot(data = data_7) +
 ## Multivariate plot looking at Wind Speed and Generator RPM
 ggplot(data = data_7) +
   geom_point(aes(x=Wind_Speed, y = Generator_RPM, color = Is_Fault)) +
-  geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Description),""))) +
+ # geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Description),""))) +
   labs(x = "Wind Speed", y = "Generator RPM", color = "Fault Status")
 
+## Multivariate plot looking at Wind Speed and Oil Temp
+ggplot(data = data_7) +
+  geom_point(aes(x=Wind_Speed, y = Oil_Temp, color = Is_Fault)) +
+  labs(x = "Wind Speed", y = "Oil Temp", color = "Fault Status")
+
+## Multivariate plot looking at Gearbox Temp and Active Power
+ggplot(data = data_7) +
+  geom_point(aes(x=Gearbox_Temp, y = Active_Power, color = Is_Fault)) +
+  labs(x = "Gearbox Temp", y = "Active Power", color = "Fault Status")
