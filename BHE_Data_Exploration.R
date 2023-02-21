@@ -3,17 +3,17 @@ library(dplyr)
 library(tidyverse)
 library(forcats)
 library(lubridate)
+library(ggplot2)
 
 ## DATA PREP -------
 # Read in Clean Data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 
 # filter data to only include Turbine 7
-df1_7 <- df1 %>% filter(Turbine == "Turbine 7")
+data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
 
 # look at data tables
-View(df1)
-View(wo_7)
+View(clean_data)
 
 ## EXPLORATORY ANALYSIS -------
 # histogram of windspeed data (smallest dataset)
@@ -45,8 +45,14 @@ ggplot(data = df2) +
   coord_flip()
 
 ### MULTIVARIATE PLOTS
-ggplot(data = df1_7) +
+ggplot(data = data_7) +
   geom_point(aes(x=Wind_Speed, y=Generator_RPM)) +
   geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Description),"")))
 
+
+## Multivariate plot looking at Wind Speed and Generator RPM
+ggplot(data = data_7) +
+  geom_point(aes(x=Wind_Speed, y = Generator_RPM, color = Is_Fault)) +
+  geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Description),""))) +
+  labs(x = "Wind Speed", y = "Generator RPM", color = "Fault Status")
 
