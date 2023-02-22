@@ -26,23 +26,6 @@ data_12 <- clean_data %>% filter(Turbine == "Turbine 12")
 View(clean_data)
 View(wo)
 
-## EXPLORATORY ANALYSIS -------
-# histogram of windspeed data (smallest dataset)
-ggplot(data = data_7) + 
-  geom_histogram(aes(x=Wind_Speed), bins = 60) + xlab("Windspeed") + ylab("Frequency")
-
-# histogram of oil temperatures
-ggplot(data = data_7) +
-  geom_histogram(aes(x=Oil_Temp), bins = 60) + xlab("Oil Temperature") + ylab("Frequency")
-
-# histogram of generator RPM
-ggplot(data = data_7) +
-  geom_histogram(aes(x=Generator_RPM), bins= 100) + xlab("Generator RPM") + ylab("Frequency")
-
-# histogram of gearbox data
-ggplot(data = data_7) +
-  geom_histogram(aes(x=Gearbox_Temp), bins= 60) + xlab("Gearbox Temp") + ylab("Frequency")
-
 #----- Analyzing the lead up to 06/05/2020 Work Order: Converter Controller - Repaired
 head(wo_7,1)
 df1$dates = as.Date(df1$Date) #Change from Character to Date
