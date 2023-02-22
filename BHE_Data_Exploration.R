@@ -35,45 +35,11 @@ View(wo)
 
 
 #### TURBINE 7
-## Multivariate plot looking at Wind Speed and Generator RPM
-ggplot(data = data_7) +
-  geom_point(aes(x=Wind_Speed, y = Generator_RPM, color = Is_Fault)) +
-  # geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Code),""))) +
-  geom_jitter(aes(x=Wind_Speed, y = Generator_RPM, color=Is_Fault), alpha = I(0.7)) +
-  labs(x = "Wind Speed", y = "Generator RPM", color = "Fault Status") +
-  scale_y_continuous(limits=c(0,1500)) + scale_x_continuous(limits=c(20,28))
 
-ggplot(data = data_7_faults) +
-  geom_point(aes(x=Wind_Speed, y = Generator_RPM)) +
-  # geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Code),""))) +
-  geom_jitter(aes(x=Wind_Speed, y = Generator_RPM), alpha = I(0.7)) +
-  labs(x = "Wind Speed", y = "Generator RPM") +
-  scale_y_continuous(limits=c(0,1500)) + scale_x_continuous(limits=c(20,28))
+## 1) Active Power & Generator RPM 0.656
 
-ggplot(data = data_7_no_faults) +
-  geom_point(aes(x=Wind_Speed, y = Generator_RPM)) +
-  # geom_text(aes(x=Wind_Speed, y=Generator_RPM, label=ifelse(Wind_Speed>26, paste0(Fault_Code),""))) +
-  geom_jitter(aes(x=Wind_Speed, y = Generator_RPM), alpha = I(0.7)) +
-  labs(x = "Wind Speed", y = "Generator RPM") +
-  scale_y_continuous(limits=c(0,1500)) + scale_x_continuous(limits=c(20,28))
 
-## Multivariate plot looking at Wind Speed and Oil Temp
-ggplot(data = data_7) +
-  geom_point(aes(x=Wind_Speed, y = Oil_Temp, color = Is_Fault)) +
-  labs(x = "Wind Speed", y = "Oil Temp", color = "Fault Status") +
-  scale_y_continuous(limits=c(20,75)) + scale_x_continuous(limits=c(20,30))
-
-ggplot(data = data_7_faults) +
-  geom_point(aes(x=Wind_Speed, y = Oil_Temp)) +
-  labs(x = "Wind Speed", y = "Oil Temp") +
-  scale_y_continuous(limits=c(20,75)) + scale_x_continuous(limits=c(20,30))
-
-ggplot(data = data_7_no_faults) +
-  geom_point(aes(x=Wind_Speed, y = Oil_Temp)) +
-  labs(x = "Wind Speed", y = "Oil Temp") +
-  scale_y_continuous(limits=c(20,75)) + scale_x_continuous(limits=c(20,30))
-
-## Multivariate plot looking at Gearbox Temp and Active Power
+## (2) Multivariate plot looking at Gearbox Temp and Active Power
 ggplot(data = data_7) +
   geom_point(aes(x=Gearbox_Temp, y = Active_Power, color = Is_Fault)) +
   labs(x = "Gearbox Temp", y = "Active Power", color = "Fault Status") +
@@ -89,28 +55,8 @@ ggplot(data = data_7_no_faults) +
   labs(x = "Gearbox Temp", y = "Active Power") +
   scale_y_continuous(limits=c(0, 3000)) + scale_x_continuous(limits=c(20, 100))
 
-## Multivariate plot looking at Wind Speed and Active Power
-ggplot(data = data_7) +
-  geom_point(aes(x=Wind_Speed, y = Active_Power, color = Is_Fault)) +
-  labs(x = "Wind Speed", y = "Active Power", color = "Fault Status") +
-  scale_y_continuous(limits=c(0,3000)) + scale_x_continuous(limits=c(20,30))
-
-ggplot(data = data_7_faults) +
-  geom_point(aes(x=Wind_Speed, y = Active_Power)) +
-  labs(x = "Wind Speed", y = "Active Power") +
-  scale_y_continuous(limits=c(0,3000)) + scale_x_continuous(limits=c(20,30))
-
-ggplot(data = data_7_no_faults) +
-  geom_point(aes(x=Wind_Speed, y = Active_Power)) +
-  labs(x = "Wind Speed", y = "Active Power") +
-  scale_y_continuous(limits=c(0,3000)) + scale_x_continuous(limits=c(20,30))
-
-## Multivariate plot looking at Gearbox Temp and Active Power
-ggplot(data = data_7) +
-  geom_point(aes(x=Gearbox_Temp, y = Generator_RPM, color = Is_Fault)) +
-  labs(x = "Gearbox Temp", y = "Generator RPM", color = "Fault Status") +
-  scale_y_continuous(limits=c(20,2000)) + scale_x_continuous(limits=c(20,100))
+## 3) Generator RPM & Oil Temp 0.449
 
 
+## 4) Active Power & Oil Temp 0.412
 
-###### TURBINE 12
