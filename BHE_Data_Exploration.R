@@ -37,11 +37,18 @@ View(wo)
 #### TURBINE 7
 
 ## 1) Active Power & Generator RPM 0.656
+ggplot(data=data_7) +
+  geom_point(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault)) +
+  geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  labs(x = "Generator RPM", y = "Active Power", color = "Fault Status") +
+  ggtitle("Active Power vs. Generator RPM") +
+  theme_bw()
 
 
 ## (2) Multivariate plot looking at Gearbox Temp and Active Power
 ggplot(data = data_7) +
   geom_point(aes(x=Gearbox_Temp, y = Active_Power, color = Is_Fault)) +
+  geom_jitter(aes(x=Gearbox_Temp, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
   labs(x = "Gearbox Temp", y = "Active Power", color = "Fault Status") +
   scale_y_continuous(limits=c(0, 3000)) + scale_x_continuous(limits=c(20, 100))
 
