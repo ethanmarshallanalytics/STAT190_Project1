@@ -27,6 +27,10 @@ View(clean_data)
 View(wo)
 
 ## MULTIVARIATE PLOTS ------------
+## Correlation Matrix
+Vars = data.frame(data_7$Oil_Temp, data_7$Generator_RPM, data_7$Wind_Speed, data_7$Gearbox_Temp, data_7$Active_Power)
+cor(cbind(Vars), use="pairwise.complete.obs")
+
 ## HIGHEST CORRELATIONS FOR TURBINE 7
 ## 1) Active Power & Generator RPM 0.656
 ## 2) Active Power & Gearbox Temp 0.516
@@ -35,45 +39,34 @@ View(wo)
 
 
 #### TURBINE 7
-
 ## 1) Active Power & Generator RPM 0.656
 ggplot(data=data_7) +
   geom_point(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault)) +
   geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
-  labs(x = "Generator RPM", y = "Active Power", color = "Fault Status") +
+  labs(x = "Generator RPM", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Active Power vs. Generator RPM") +
   theme_bw()
 
 
 ## (2) Multivariate plot looking at Gearbox Temp and Active Power
 ggplot(data = data_7) +
-  geom_point(aes(x=Gearbox_Temp, y = Active_Power, color = Is_Fault)) +
-  geom_jitter(aes(x=Gearbox_Temp, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
-  labs(x = "Gearbox Temp", y = "Active Power", color = "Fault Status") +
-  scale_y_continuous(limits=c(0, 3000)) + scale_x_continuous(limits=c(20, 100))
-
-ggplot(data = data_7_faults) +
-  geom_point(aes(x=Gearbox_Temp, y = Active_Power)) +
-  labs(x = "Gearbox Temp", y = "Active Power") +
-  scale_y_continuous(limits=c(0, 3000)) + scale_x_continuous(limits=c(20, 100))
-
-ggplot(data = data_7_no_faults) +
-  geom_point(aes(x=Gearbox_Temp, y = Active_Power)) +
-  labs(x = "Gearbox Temp", y = "Active Power") +
-  scale_y_continuous(limits=c(0, 3000)) + scale_x_continuous(limits=c(20, 100))
+  geom_point(aes(x=Gearbox_Temp, y=Active_Power, color = Is_Fault)) +
+  geom_jitter(aes(x=Gearbox_Temp, y=Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  labs(x = "Gearbox Temperature (ºC)", y = "Active Power (kw)", color = "Fault Status") +
+  ggtitle("Active Power vs. Gearbox Temperature")
 
 ## 3) Generator RPM & Oil Temp 0.449
 ggplot(data=data_7) +
   geom_point(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault)) +
   geom_jitter(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault), alpha=I(0.5)) +
-  labs(x = "Generator RPM", y = "Oil Temp", color = "Fault Status") +
-  ggtitle("Active Power vs. Generator RPM") +
+  labs(x = "Generator RPM", y = "Oil Temperature (ºC)", color = "Fault Status") +
+  ggtitle("Oil Temperature vs. Generator RPM") +
   theme_bw()
 
 ## 4) Active Power & Oil Temp 0.412
 ggplot(data=data_7) +
-  geom_point(aes(x=Oil_Temp, y = Active_Power, color = Is_Fault)) +
-  geom_jitter(aes(x=Oil_Temp, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
-  labs(x = "Generator RPM", y = "Active Power", color = "Fault Status") +
-  ggtitle("Active Power vs. Generator RPM") +
+  geom_point(aes(x=Active_Power, y = Oil_Temp, color = Is_Fault)) +
+  geom_jitter(aes(x=Active_Power, y = Oil_Temp, color = Is_Fault), alpha=I(0.5)) +
+  labs(x = "Active Power (kW)", y = "Oil Temperature (ºC)", color = "Fault Status") +
+  ggtitle("Oil Temperature vs. Active Power") +
   theme_bw()
