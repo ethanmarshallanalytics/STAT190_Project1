@@ -27,6 +27,13 @@ View(clean_data)
 View(wo)
 
 ## MULTIVARIATE PLOTS ------------
+## HIGHEST CORRELATIONS FOR TURBINE 7
+## 1) Active Power & Generator RPM 0.656
+## 2) Active Power & Gearbox Temp 0.516
+## 3) Generator RPM & Oil Temp 0.449
+## 4) Active Power & Oil Temp 0.412
+
+
 #### TURBINE 7
 ## Multivariate plot looking at Wind Speed and Generator RPM
 ggplot(data = data_7) +
@@ -97,6 +104,12 @@ ggplot(data = data_7_no_faults) +
   geom_point(aes(x=Wind_Speed, y = Active_Power)) +
   labs(x = "Wind Speed", y = "Active Power") +
   scale_y_continuous(limits=c(0,3000)) + scale_x_continuous(limits=c(20,30))
+
+## Multivariate plot looking at Gearbox Temp and Active Power
+ggplot(data = data_7) +
+  geom_point(aes(x=Gearbox_Temp, y = Generator_RPM, color = Is_Fault)) +
+  labs(x = "Gearbox Temp", y = "Generator RPM", color = "Fault Status") +
+  scale_y_continuous(limits=c(20,2000)) + scale_x_continuous(limits=c(20,100))
 
 
 
