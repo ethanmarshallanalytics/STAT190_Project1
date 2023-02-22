@@ -63,7 +63,17 @@ ggplot(data = data_7_no_faults) +
   scale_y_continuous(limits=c(0, 3000)) + scale_x_continuous(limits=c(20, 100))
 
 ## 3) Generator RPM & Oil Temp 0.449
-
+ggplot(data=data_7) +
+  geom_point(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault)) +
+  geom_jitter(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault), alpha=I(0.5)) +
+  labs(x = "Generator RPM", y = "Oil Temp", color = "Fault Status") +
+  ggtitle("Active Power vs. Generator RPM") +
+  theme_bw()
 
 ## 4) Active Power & Oil Temp 0.412
-
+ggplot(data=data_7) +
+  geom_point(aes(x=Oil_Temp, y = Active_Power, color = Is_Fault)) +
+  geom_jitter(aes(x=Oil_Temp, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  labs(x = "Generator RPM", y = "Active Power", color = "Fault Status") +
+  ggtitle("Active Power vs. Generator RPM") +
+  theme_bw()
