@@ -19,24 +19,12 @@ data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
 data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == 1)
 data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == 0)
 
-# filter data to only include Turbine 10
+# filter data to only include Turbine 12
 data_12 <- clean_data %>% filter(Turbine == "Turbine 12")
 
 # look at data tables
 View(clean_data)
 View(wo)
-
-#----- Analyzing the lead up to 06/05/2020 Work Order: Converter Controller - Repaired
-head(wo_7,1)
-df1$dates = as.Date(df1$Date) #Change from Character to Date
-# New Data frame looking at Fault Codes from 05/22/2020 - 06/05/2020
-df2 = subset(df1, Date < as.Date("2020-06-05") & Date > as.Date("2020-05-22"))
-table(df2$Fault_Code)
-
-ggplot(data = df2) +
-  geom_bar(aes(x=fct_infreq(Fault_Description))) + xlab("Fault Description") + ylab("Frequency") +
-  labs(x = "Fault_Description")+
-  coord_flip()
 
 ## MULTIVARIATE PLOTS ------------
 #### TURBINE 7
