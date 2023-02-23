@@ -8,8 +8,6 @@ library(ggplot2)
 ## DATA PREP -------
 # Read in Clean Data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
-# slight correction in Is_Fault column to deal with missing values
-clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
 
 # Read in work order data
 wo = read.csv("Project1Data/work order scrubbed.csv")

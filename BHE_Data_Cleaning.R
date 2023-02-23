@@ -4,6 +4,7 @@ library(tidyverse)
 library(forcats)
 library(lubridate)
 
+### ORIGINAL DATA -------
 # read in windspeed.csv
 wind <- read.csv("Project1Data/windspeed.csv")
 # read in gearbox_oil_temp.csv
@@ -84,3 +85,37 @@ df1$Active_Power[is.na(df1$Active_Power)] <- mean(df1$Active_Power, na.rm=TRUE)
 
 # write aggregated file to CSV
 write.csv(df1, "Project1Data/clean_BHE_data.csv")
+
+### NEW DATA ... AMBIENT TEMPERATURE --------
+# Read in Clean Data
+clean_data = read.csv("Project1Data/clean_BHE_data.csv")
+# Read in ambient temperature
+at <- read.csv("Project1Data/ambient_temp.csv")
+# function to change data types, group on 10 minute intervals, and find average value
+grouping <- function(data){
+  data$V2 <- ymd_hms(data$V2)
+  data$Round_Time <- round_date(data$V2, "10 minute")
+  data <- data %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(V4, na.rm=TRUE))
+}
+# call grouping function on at
+at = grouping(at)
+
+# change round time in clean_data to timestamp
+clean_data$Round_Time <- ymd_hms(clean_data$Round_Time) # change from chr to timestamp
+
+# join clean data to ambient temperature
+clean_data <- clean_data %>% 
+  full_join(at, by=c("Round_Time"="Round_Time", "Turbine"="V1"))
+
+# rename new column to something meaningful
+clean_data <- clean_data %>% rename("Ambient_Temp" = "Avg_Value")
+  
+# replace missing values with mean
+clean_data$Ambient_Temp[is.na(clean_data$Ambient_Temp)] <- mean(clean_data$Ambient_Temp, na.rm=TRUE)
+
+# slight correction in Is_Fault column to deal with missing values
+clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
+
+# write aggregated file to CSV
+write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
+
