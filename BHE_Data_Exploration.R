@@ -18,6 +18,7 @@ data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == 1)
 data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == 0)
 
 # filter data to only include Turbine 12
+# MAYBE EXPAND ON THIS FOR FURTHER ANALYSIS
 data_12 <- clean_data %>% filter(Turbine == "Turbine 12")
 
 # look at data tables
@@ -78,3 +79,11 @@ ggplot(data=data_7) +
   labs(x = "Gearbox Temperature (ºC)", y = "Oil Temperature (ºC)", color = "Fault Status") +
   ggtitle("Oil Temperature vs. Gearbox Temperature") +
   theme_bw()
+
+## GLM ------
+# Build a model to predict the probability of a fault code occurring
+# Build a model to predict the probability of a work order
+
+
+## EDGE CASE ANALYSIS ----
+# Determine what causes fault codes for outlier data points

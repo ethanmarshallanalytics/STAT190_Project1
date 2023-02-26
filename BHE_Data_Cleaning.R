@@ -114,8 +114,14 @@ clean_data <- clean_data %>% rename("Ambient_Temp" = "Avg_Value")
 clean_data$Ambient_Temp[is.na(clean_data$Ambient_Temp)] <- mean(clean_data$Ambient_Temp, na.rm=TRUE)
 
 # slight correction in Is_Fault column to deal with missing values
+# assume no fault code occurred
 clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
 
 # write aggregated file to CSV
 write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
 
+
+### NEW COLUMN ... Is_WorkOrder -----
+# Connect fault code data to work order data to determine whether a work order
+  # resulted from a specific fault code
+# Put into new column for clean_BHE_data
