@@ -88,6 +88,16 @@ ggplot(data=data_7) +
   ggtitle("Wind Speed vs Active Power") +
   theme_bw()
 
+## SCATTER PLOT NOTES
+# scatterplots - zoom in on the main trends in the scatterplots. Sometimes the default x/y limits aren’t ideal 
+# scatterplots - find ways to deal with over plotting (alpha blending, faceting, heatmaps)
+# scatterplots - independent variable (e.g., windspeed) should be on x axis while dependent variable (e.g.,power output) should be on y axis
+# plots - clean them up, make them professional: 172 style. Daniel has noticed both the good and the bad.
+# scatterplots - color by fault type, not just existence of a faul
+# PLOTS PLOTS PLOTS, MULTIDIMENSIONAL ONES (scatterplots, but also incorporate color,facets) and then models based on that
+# Do a decent scatterplot matrix, please: https://plotly.com/ggplot2/splom/
+
+
 ## GLM ------
 # Build a model to predict the probability of a fault code occurring
 # Build a model to predict the probability of a work order
