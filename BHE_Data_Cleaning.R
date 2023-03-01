@@ -120,6 +120,19 @@ clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
 # write aggregated file to CSV
 write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
 
+### IS_FAULT UPDATES ------
+# read in clean_data
+clean_data = read.csv("Project1Data/clean_BHE_data.csv")
+
+# remove Is_Fault column to start fresh
+clean_data <- subset(clean_data, select = -c(Is_Fault))
+
+# change Is_Fault column to only include the correct faults
+clean_data$Is_Fault <- ifelse(clean_data$Fault_Type %in% c("Informational", "", "Human Performance", "Yaw System"), "Yes", "No")
+
+# slight correction in Is_Fault column to deal with missing values
+# assume no fault code occurred
+clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = "No"
 
 ### NEW COLUMN ... Is_WorkOrder -----
 # Connect fault code data to work order data to determine whether a work order
