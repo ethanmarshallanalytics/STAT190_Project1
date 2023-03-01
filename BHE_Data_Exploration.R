@@ -80,6 +80,14 @@ ggplot(data=data_7) +
   ggtitle("Oil Temperature vs. Gearbox Temperature") +
   theme_bw()
 
+## 6) Windspeed and Active Power
+ggplot(data=data_7) +
+  geom_point(aes(x=Wind_Speed, y = Active_Power, color = Is_Fault)) +
+  geom_jitter(aes(x=Wind_Speed, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  labs(x = "Wind Speed (m/s)", y = "Active Power (kW)", color = "Fault Status") +
+  ggtitle("Wind Speed vs Active Power") +
+  theme_bw()
+
 ## GLM ------
 # Build a model to predict the probability of a fault code occurring
 # Build a model to predict the probability of a work order
