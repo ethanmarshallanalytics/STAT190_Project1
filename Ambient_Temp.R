@@ -4,7 +4,7 @@ library(tidyverse)
 library(lubridate)
 library(readr)
 
-at_files <- list.files("Project1Data/ambient_temperature")
+at_files <- list.files("ambient_temperature/ambient_temperature")
 at_files
 
 combined_data_at <- data.frame()
@@ -13,7 +13,7 @@ combined_data_at <- data.frame()
 for (file in at_files[-1]) {
   
   
-  data <- read.csv(paste0("Project1Data/ambient_temperature/", file), header = FALSE)
+  data <- read.csv(paste0("ambient_temperature/ambient_temperature/", file), header = FALSE)
   
   # Append the data to the combined_data data frame
   combined_data_at <- rbind(combined_data_at, data)
