@@ -14,6 +14,9 @@ library(scales)
 # Read in Clean Data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 
+# Changing is_fault from Integer to character
+clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
+
 # Read in work order data
 wo = read.csv("Project1Data/work order scrubbed.csv")
 
@@ -131,6 +134,17 @@ agg_fault %>%
       scale_y_continuous(label=comma, limits=c(0,200000), breaks=c(0, 25000, 50000, 75000, 100000, 125000, 150000, 175000, 200000)) +
       coord_flip() + theme_bw()
 
+#### -------- Ambient Temp and Gearbox Temp
+# Creates the new varaible Delta Temp
+clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
+
+# Graph looking at Active Power and Delta Temp
+ggplot(data=data_7) +
+  geom_point(aes(x=delta_temp, y = Active_Power, color = Is_Fault)) +
+  geom_jitter(aes(x=delta_temp, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  labs(x = "Delta Temperature (Ambient & Gearbox) (Celcius)", y = "Active Power (kW)", color = "Fault Status") +
+  ggtitle("Delta Temp vs Active Power") +
+  theme_bw()
 
 ## SCATTER PLOT NOTES
 # scatterplots - zoom in on the main trends in the scatterplots. Sometimes the default x/y limits aren’t ideal 
