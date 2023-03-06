@@ -14,24 +14,6 @@ library(scales)
 # Read in Clean Data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 
-# Changing is_fault from Integer to character
-clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
-
-# Categorize Wind_Speed into 3 sections
-clean_data$Wind_Speed_Group <- cut(clean_data$Wind_Speed,
-                                   breaks = c(15, 22.1, 22.15, 50),
-                                   include.lowest = T,
-                                   right=F)
-
-# Convert new category to factor type and rename
-clean_data$Wind_Speed_Group <- factor(clean_data$Wind_Speed_Group,
-                                      levels = c("[15,22.1)", "[22.1,22.15)", "[22.15,50]"),
-                                      labels = c("Low", "Medium", "High"))
-
-# Creates the new variable Delta Temp
-clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
-
-
 # Read in work order data
 wo = read.csv("Project1Data/work order scrubbed.csv")
 

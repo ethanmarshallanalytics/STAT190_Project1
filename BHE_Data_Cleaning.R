@@ -120,20 +120,43 @@ clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
 # write aggregated file to CSV
 write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
 
-### IS_FAULT UPDATES ------
+### NUll/BLANK CORRECTIONS & DATA ENGINEERING ------
 # read in clean_data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 
+# corrections to Is_Fault, Fault_Type, and Fault_Description to deal with missing values
+# assume no fault code occurred
+clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
+clean_data$Fault_Type[is.na(clean_data$Fault_Type)] = "No Fault"
+clean_data$Fault_Description[is.na(clean_data$Fault_Description)] = "No Fault"
+
+# rename blank strings to "no fault"
+clean_data$Fault_Type <- ifelse(clean_data$Fault_Type == "", "No Fault", clean_data$Fault_Type)
+clean_data$Fault_Description <- ifelse(clean_data$Fault_Description == "", "No Fault", clean_data$Fault_Description)
+
+# Changing is_fault from Integer to character
+clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
+
+# Categorize Wind_Speed into 3 sections
+clean_data$Wind_Speed_Group <- cut(clean_data$Wind_Speed,
+                                   breaks = c(15, 22.1, 22.15, 50),
+                                   include.lowest = T,
+                                   right=F)
+
+# Convert new Wind_Speed category to factor type and rename groups
+clean_data$Wind_Speed_Group <- factor(clean_data$Wind_Speed_Group,
+                                      levels = c("[15,22.1)", "[22.1,22.15)", "[22.15,50]"),
+                                      labels = c("Low", "Medium", "High"))
+
+# Creates the new variable Delta Temp (Ambient Temperature - Gearbox Temperature)
+clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
+
+# write aggregated file to CSV
+write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
+
+### IS_FAULT UPDATES ------
 # remove Is_Fault column to start fresh
 clean_data <- subset(clean_data, select = -c(Is_Fault))
 
 # change Is_Fault column to only include the correct faults
 clean_data$Is_Fault <- ifelse(clean_data$Fault_Type %in% c("Informational", "", "Human Performance", "Yaw System"), 1, 0)
-
-# slight correction in Is_Fault column to deal with missing values
-# assume no fault code occurred
-clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
-
-# rename N/A faults to "no fault"
-clean_data$Fault_Description[is.na(clean_data$Fault_Description)] = "No Fault"
-clean_data$Fault_Type[is.na(clean_data$Fault_Type)] = "No Fault"
