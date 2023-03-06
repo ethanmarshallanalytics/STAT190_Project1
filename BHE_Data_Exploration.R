@@ -28,13 +28,17 @@ clean_data$Wind_Speed_Group <- factor(clean_data$Wind_Speed_Group,
                                       levels = c("[15,22.1)", "[22.1,22.15)", "[22.15,50]"),
                                       labels = c("Low", "Medium", "High"))
 
+# Creates the new variable Delta Temp
+clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
+
+
 # Read in work order data
 wo = read.csv("Project1Data/work order scrubbed.csv")
 
 # filter data to only include Turbine 7
 data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
-data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == 1)
-data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == 0)
+data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "1")
+data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "0")
 
 # filter data to only include Turbine 12
 # MAYBE EXPAND ON THIS FOR FURTHER ANALYSIS
@@ -142,18 +146,15 @@ agg_fault %>%
       geom_bar(stat='identity') + 
       labs(x="Fault Description", y="Frequency") +
       ggtitle("Top 5 Most Frequent Fault Descriptions for Turbine 7") +
-      scale_y_continuous(label=comma, limits=c(0,200000), breaks=c(0, 25000, 50000, 75000, 100000, 125000, 150000, 175000, 200000)) +
+      scale_y_continuous(limits=c(0,200000), breaks=c(0, 25000, 50000, 75000, 100000, 125000, 150000, 175000, 200000)) +
       coord_flip() + theme_bw()
 
 #### -------- Ambient Temp and Gearbox Temp
-# Creates the new varaible Delta Temp
-clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
-
 # Graph looking at Active Power and Delta Temp
 ggplot(data=data_7) +
-  geom_point(aes(x=delta_temp, y = Active_Power, color = Is_Fault)) +
-  geom_jitter(aes(x=delta_temp, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
-  labs(x = "Delta Temperature (Ambient & Gearbox) (Celcius)", y = "Active Power (kW)", color = "Fault Status") +
+  geom_point(aes(x=delta_temp, y = Active_Power, color = Fault_Type)) +
+  geom_jitter(aes(x=delta_temp, y = Active_Power, color = Fault_Type), alpha=I(0.5)) +
+  labs(x = "Delta Temperature (Ambient & Gearbox) (ºC)", y = "Active Power (kW)", color = "Fault Type") +
   ggtitle("Delta Temp vs Active Power") +
   theme_bw()
 

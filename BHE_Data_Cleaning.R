@@ -133,3 +133,7 @@ clean_data$Is_Fault <- ifelse(clean_data$Fault_Type %in% c("Informational", "", 
 # slight correction in Is_Fault column to deal with missing values
 # assume no fault code occurred
 clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
+
+# rename N/A faults to "no fault"
+clean_data$Fault_Description[is.na(clean_data$Fault_Description)] = "No Fault"
+clean_data$Fault_Type[is.na(clean_data$Fault_Type)] = "No Fault"
