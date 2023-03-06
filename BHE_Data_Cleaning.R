@@ -128,16 +128,8 @@ clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 clean_data <- subset(clean_data, select = -c(Is_Fault))
 
 # change Is_Fault column to only include the correct faults
-clean_data$Is_Fault <- ifelse(clean_data$Fault_Type %in% c("Informational", "", "Human Performance", "Yaw System"), "Yes", "No")
+clean_data$Is_Fault <- ifelse(clean_data$Fault_Type %in% c("Informational", "", "Human Performance", "Yaw System"), 1, 0)
 
 # slight correction in Is_Fault column to deal with missing values
 # assume no fault code occurred
-clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = "No"
-
-# new column to calculate different in Gearbox temp and Ambient Temp
-clean_data$Temp_Diff <- clean_data$Gearbox_Temp - clean_data$Ambient_Temp
-
-### NEW COLUMN ... Is_WorkOrder -----
-# Connect fault code data to work order data to determine whether a work order
-  # resulted from a specific fault code
-# Put into new column for clean_BHE_data
+clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
