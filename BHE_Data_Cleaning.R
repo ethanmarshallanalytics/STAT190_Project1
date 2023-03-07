@@ -120,6 +120,44 @@ clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
 # write aggregated file to CSV
 write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
 
+### NEW DATA ... HYDRAULIC PRESSURE ------
+# Read in Clean Data
+clean_data = read.csv("Project1Data/clean_BHE_data.csv")
+# Read in ambient temperature
+hp <- read.csv("Project1Data/hydraulic_pressure.csv")
+# function to change data types, group on 10 minute intervals, and find average value
+grouping <- function(data){
+  data$V2 <- ymd_hms(data$V2)
+  data$Round_Time <- round_date(data$V2, "10 minute")
+  data <- data %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(V4, na.rm=TRUE))
+}
+# call grouping function on at
+hp = grouping(hp)
+
+# change round time in clean_data to timestamp
+clean_data$Round_Time <- ymd_hms(clean_data$Round_Time) # change from chr to timestamp
+
+# join clean data to ambient temperature
+clean_data <- clean_data %>% 
+  full_join(hp, by=c("Round_Time"="Round_Time", "Turbine"="V1"))
+
+# rename new column to something meaningful
+clean_data <- clean_data %>% rename("Hydraulic_Pressure" = "Avg_Value")
+
+# replace missing values with mean
+clean_data$Hydraulic_Pressure[is.na(clean_data$Hydraulic_Pressure)] <- mean(clean_data$Hydraulic_Pressure, na.rm=TRUE)
+
+# slight correction in Is_Fault column to deal with missing values
+# assume no fault code occurred
+clean_data$Is_Fault[is.na(clean_data$Is_Fault)] = 0
+
+# remove extra columns from join
+clean_data <- subset(clean_data, select = -c(X, X.1, X.2, X.3, X.4))
+
+# write aggregated file to CSV
+write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
+
+
 ### NUll/BLANK CORRECTIONS & DATA ENGINEERING ------
 # read in clean_data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")

@@ -4,7 +4,7 @@ library(tidyverse)
 library(lubridate)
 library(readr)
 
-hp_files <- list.files("Hydraulic Pressure/Hydraulic Pressure")
+hp_files <- list.files("Project1Data/Hydraulic Pressure")
 hp_files
 
 combined_data_hp <- data.frame()
@@ -13,11 +13,11 @@ combined_data_hp <- data.frame()
 for (file in hp_files[-1]) {
   
   
-  data <- read.csv(paste0("Hydraulic Pressure/Hydraulic Pressure/", file), header = FALSE)
+  data <- read.csv(paste0("Project1Data/Hydraulic Pressure/", file), header = FALSE)
   
   # Append the data to the combined_data data frame
   combined_data_hp <- rbind(combined_data_hp, data)
 }
 
-  # Write the combined data to a file
+# Write the combined data to a file
 write.csv(combined_data_hp, "Project1Data/hydraulic_pressure.csv")
