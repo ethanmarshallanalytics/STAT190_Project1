@@ -134,9 +134,6 @@ clean_data$Fault_Description[is.na(clean_data$Fault_Description)] = "No Fault"
 clean_data$Fault_Type <- ifelse(clean_data$Fault_Type == "", "No Fault", clean_data$Fault_Type)
 clean_data$Fault_Description <- ifelse(clean_data$Fault_Description == "", "No Fault", clean_data$Fault_Description)
 
-# Changing is_fault from Integer to character
-clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
-
 # Categorize Wind_Speed into 3 sections
 clean_data$Wind_Speed_Group <- cut(clean_data$Wind_Speed,
                                    breaks = c(15, 22.1, 22.15, 50),

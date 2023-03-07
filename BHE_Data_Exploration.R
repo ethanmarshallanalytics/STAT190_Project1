@@ -14,6 +14,9 @@ library(scales)
 # Read in Clean Data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 
+# Changing is_fault from Integer to character
+clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
+
 # Read in work order data
 wo = read.csv("Project1Data/work order scrubbed.csv")
 
@@ -67,7 +70,7 @@ ggplotly(p)
 ## 1) Active Power & Generator RPM
 ggplot(data=data_7) +
   geom_point(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault)) +
-  geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Generator RPM", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Active Power vs. Generator RPM") +
   theme_bw()
@@ -76,7 +79,7 @@ ggplot(data=data_7) +
 ## 2) Gearbox Temp and Active Power
 ggplot(data = data_7) +
   geom_point(aes(x=Gearbox_Temp, y=Active_Power, color = Is_Fault)) +
-  geom_jitter(aes(x=Gearbox_Temp, y=Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  geom_jitter(aes(x=Gearbox_Temp, y=Active_Power, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Gearbox Temperature (ºC)", y = "Active Power (kw)", color = "Fault Status") +
   ggtitle("Active Power vs. Gearbox Temperature") +
   theme_bw()
@@ -84,7 +87,7 @@ ggplot(data = data_7) +
 ## 3) Generator RPM & Oil Temp 
 ggplot(data=data_7) +
   geom_point(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault)) +
-  geom_jitter(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault), alpha=I(0.5)) +
+  geom_jitter(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Generator RPM", y = "Oil Temperature (ºC)", color = "Fault Status") +
   ggtitle("Oil Temperature vs. Generator RPM") +
   theme_bw()
@@ -92,7 +95,7 @@ ggplot(data=data_7) +
 ## 4) Active Power & Oil Temp
 ggplot(data=data_7) +
   geom_point(aes(x=Active_Power, y = Oil_Temp, color = Is_Fault)) +
-  geom_jitter(aes(x=Active_Power, y = Oil_Temp, color = Is_Fault), alpha=I(0.5)) +
+  geom_jitter(aes(x=Active_Power, y = Oil_Temp, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Active Power (kW)", y = "Oil Temperature (ºC)", color = "Fault Status") +
   ggtitle("Oil Temperature vs. Active Power") +
   theme_bw()
@@ -100,7 +103,7 @@ ggplot(data=data_7) +
 ## 5) Gearbox Temp & Oil Temp
 ggplot(data=data_7) +
   geom_point(aes(x=Gearbox_Temp, y = Oil_Temp, color = Is_Fault)) +
-  geom_jitter(aes(x=Gearbox_Temp, y = Oil_Temp, color = Is_Fault), alpha=I(0.5)) +
+  geom_jitter(aes(x=Gearbox_Temp, y = Oil_Temp, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Gearbox Temperature (ºC)", y = "Oil Temperature (ºC)", color = "Fault Status") +
   ggtitle("Oil Temperature vs. Gearbox Temperature") +
   theme_bw()
@@ -108,7 +111,7 @@ ggplot(data=data_7) +
 ## 6) Windspeed and Active Power
 ggplot(data=data_7) +
   geom_point(aes(x=Wind_Speed, y = Active_Power, color = Is_Fault)) +
-  geom_jitter(aes(x=Wind_Speed, y = Active_Power, color = Is_Fault), alpha=I(0.5)) +
+  geom_jitter(aes(x=Wind_Speed, y = Active_Power, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Wind Speed (m/s)", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Wind Speed vs Active Power") +
   theme_bw()
@@ -135,7 +138,7 @@ agg_fault %>%
 # Graph looking at Active Power and Delta Temp
 ggplot(data=data_7) +
   geom_point(aes(x=delta_temp, y = Active_Power, color = Fault_Type)) +
-  geom_jitter(aes(x=delta_temp, y = Active_Power, color = Fault_Type), alpha=I(0.5)) +
+  geom_jitter(aes(x=delta_temp, y = Active_Power, color = Fault_Type), alpha=I(0.3)) +
   labs(x = "Delta Temperature (Ambient & Gearbox) (ºC)", y = "Active Power (kW)", color = "Fault Type") +
   ggtitle("Delta Temp vs Active Power") +
   theme_bw()
@@ -148,6 +151,9 @@ ggplot(data=data_7) +
 # scatterplots - color by fault type, not just existence of a fault
 # PLOTS PLOTS PLOTS, MULTIDIMENSIONAL ONES (scatterplots, but also incorporate color,facets) and then models based on that
 # Do a decent scatterplot matrix, please: https://plotly.com/ggplot2/splom/
+
+## HEATMAP RESOURCE
+# https://r-graph-gallery.com/79-levelplot-with-ggplot2.html
 
 
 ## GLM ------
