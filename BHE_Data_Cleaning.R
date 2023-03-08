@@ -172,17 +172,6 @@ clean_data$Fault_Description[is.na(clean_data$Fault_Description)] = "No Fault"
 clean_data$Fault_Type <- ifelse(clean_data$Fault_Type == "", "No Fault", clean_data$Fault_Type)
 clean_data$Fault_Description <- ifelse(clean_data$Fault_Description == "", "No Fault", clean_data$Fault_Description)
 
-# Categorize Wind_Speed into 3 sections
-clean_data$Wind_Speed_Group <- cut(clean_data$Wind_Speed,
-                                   breaks = c(15, 22.1, 22.15, 50),
-                                   include.lowest = T,
-                                   right=F)
-
-# Convert new Wind_Speed category to factor type and rename groups
-clean_data$Wind_Speed_Group <- factor(clean_data$Wind_Speed_Group,
-                                      levels = c("[15,22.1)", "[22.1,22.15)", "[22.15,50]"),
-                                      labels = c("Low", "Medium", "High"))
-
 # Creates the new variable Delta Temp (Ambient Temperature - Gearbox Temperature)
 clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
 
@@ -190,8 +179,96 @@ clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
 write.csv(clean_data, "Project1Data/clean_BHE_data.csv")
 
 ### IS_FAULT UPDATES ------
+# read in clean_data
+clean_data = read.csv("Project1Data/clean_BHE_data.csv")
+
+# replace missing values with mean
+clean_data$Oil_Temp[is.na(clean_data$Oil_Temp)] <- mean(clean_data$Oil_Temp, na.rm=TRUE)
+clean_data$Generator_RPM[is.na(clean_data$Generator_RPM)] <- mean(clean_data$Generator_RPM, na.rm=TRUE)
+clean_data$Wind_Speed[is.na(clean_data$Wind_Speed)] <- mean(clean_data$Wind_Speed, na.rm=TRUE)
+clean_data$Gearbox_Temp[is.na(clean_data$Gearbox_Temp)] <- mean(clean_data$Gearbox_Temp, na.rm=TRUE)
+clean_data$Active_Power[is.na(clean_data$Active_Power)] <- mean(clean_data$Active_Power, na.rm=TRUE)
+clean_data$Ambient_Temp[is.na(clean_data$Ambient_Temp)] <- mean(clean_data$Ambient_Temp, na.rm=TRUE)
+
+# Delta Temp (Ambient Temperature - Gearbox Temperature) to include imputed value
+clean_data$delta_temp = abs(clean_data$Ambient_Temp - clean_data$Gearbox_Temp)
+
+# Categorize Wind_Speed into 3 sections
+clean_data$Wind_Speed_Group <- cut(clean_data$Wind_Speed,
+                                   breaks = c(0, 20, 30, 50),
+                                   include.lowest = T,
+                                   right=F)
+
+# Convert new Wind_Speed category to factor type and rename groups
+clean_data$Wind_Speed_Group <- factor(clean_data$Wind_Speed_Group,
+                                      levels = c("[0,20)", "[20,30)", "[30,50]"),
+                                      labels = c("Low", "Medium", "High"))
+
+
 # remove Is_Fault column to start fresh
 clean_data <- subset(clean_data, select = -c(Is_Fault))
 
 # change Is_Fault column to only include the correct faults
-clean_data$Is_Fault <- ifelse(clean_data$Fault_Type %in% c("Informational", "", "Human Performance", "Yaw System"), 1, 0)
+# Faults listed are NOT important ... Is_Fault = 0
+clean_data$Is_Fault <- ifelse(clean_data$Fault_Description %in% 
+                                  c("Ice Detection: Low Torque"
+                                    ,"No Fault"
+                                    ,"Remote Stop - Oem"
+                                    ,"Remote Stop - Owner"
+                                    ,"Stop For Powerdown"
+                                    ,"Stopped Due To Power Up Delay"
+                                    ,"Stopped For Sw Update"
+                                    ,"Stopped, Untwisting Cables"
+                                    ,"Manual Stop"
+                                    ,"Manual Idle Stop"
+                                    ,"Manual Idle Stop - Yawing"
+                                    ,"Mcb Cleaning Ended"
+                                    ,"Mcb Cleaning In Progresss"
+                                    ,"No Valid Wind Data"
+                                    ,"Lmu Sensor Error"
+                                    ,"Ups Bypass Error"
+                                    ,"Yaw Converter Error"
+                                    ,"Too Many Slip Ring Errors"
+                                    ,"Too Many Yaw Conv. Errors"
+                                    ,"Slip Ring Error"
+                                    ,"Rpm Sensor Error"
+                                    ,"No Valid Wind Data"
+                                    ,"Inline (Bef) Pressure Sensor Error"
+                                    ,"Inline (Aft) Pressure Sensor Error"
+                                    ,"Hub: Blade A Valve Error"
+                                    ,"Hub: Blade B Valve Error"
+                                    ,"Hub: Blade C Valve Error"
+                                    ,"Hyd Oil Level Error"
+                                    ,"Grid Filter Res Temp Error"
+                                    ,"Grd. Inv. Communication Error"
+                                    ,"Ft1 Sonic Wind Sensor Error"
+                                    ,"Ambient Temp Sensor Error"
+                                    ,"Backup Battery Error"
+                                    ,"Brake (Gen) Temperature Error"
+                                    ,"Can 3 Buffer Overrorun Error"
+                                    ,"Can:Hub Communication Error"
+                                    ,"Can:Gs-1 Communication Error"
+                                    ,"Can:Gm  Communication Error"
+                                    ,"Can:Hub Module Init. Error"
+                                    ,"Can:Io-1 Communication Error"
+                                    ,"Can:Io-2 Communication Error"
+                                    ,"Can:Io-3 Communication Error"
+                                    ,"Can:Io-3 Module Init. Error"
+                                    ,"Can:Io-4 Communication Error"
+                                    ,"Can:Io-4 Module Init. Error"
+                                    ,"Can:Io-7 Communication Error"
+                                    ,"Offline Filter Stopped"
+                                    ,"Pitch A Tracking During Stop"
+                                    ,"Pitch B Tracking During Stop"
+                                    ,"Pitch C Tracking During Stop"
+                                    ,"Pitch Pump Time Too Long,Stop|"
+                                    ,"Pitch Pawl A Feedb. Stop"
+                                    ,"Timeout  Dc-Circuit Charging"
+                                    ,"Low Torque, No Ice (Temp=Norm)"
+                                    ,"Local, Ad-Hoc / Repair Work"
+                                    ,"Local, Customer / Guest Visit"
+                                    ,"Local, Scheduled Service Work"), 0, 1)
+
+
+# write to a fresh CSV file
+write.csv(clean_data, "Project1Data/clean_BHE_data.csv", row.names=F)
