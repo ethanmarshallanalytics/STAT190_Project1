@@ -19,12 +19,14 @@ clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 # Changing is_fault from Integer to character
 clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
 
-# Read in work order data
+# Read in work order 
+wo1 = read.csv("Project1Data/wo1.csv")
 wo = read.csv("Project1Data/work order scrubbed.csv")
 
-wo <- wo %>% 
-  filter(component_type != "null")
+#wo1 <- wo %>% 
+# filter(component_type != "null")
 
+#write.csv(wo1, "Project1Data/wo1.csv")
 
 
 # filter data to only include Turbine 7
@@ -80,6 +82,14 @@ ggplot(data=data_7) +
   geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Generator RPM", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Active Power vs. Generator RPM") +
+  theme_bw()
+
+ggplot(data=clean_data) +
+  geom_point(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault)) +
+  geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.3)) +
+  labs(x = "Generator RPM", y = "Active Power (kW)", color = "Fault Status") +
+  ggtitle("Active Power vs. Generator RPM") +
+  facet_wrap(~ Turbine, ncol = 2) +  # add facet by turbine
   theme_bw()
 
 
