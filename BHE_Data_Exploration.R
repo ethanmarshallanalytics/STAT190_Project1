@@ -116,6 +116,29 @@ ggplot(data=data_7) +
   ggtitle("Wind Speed vs Active Power") +
   theme_bw()
 
+# 7) Ambient Temp and Gearbox Temp ----
+# Graph looking at Active Power and Delta Temp
+ggplot(data=data_7) +
+  geom_point(aes(x=delta_temp, y = Active_Power, color = Fault_Type)) +
+  geom_jitter(aes(x=delta_temp, y = Active_Power, color = Fault_Type), alpha=I(0.3)) +
+  labs(x = "Delta Temperature (Ambient & Gearbox) (ºC)", y = "Active Power (kW)", color = "Fault Type") +
+  ggtitle("Delta Temp vs Active Power") +
+  theme_bw()
+
+# 8) Hydraulic Pressure & Active Power ------
+subset_fault_1 <- subset(data_7, Is_Fault == 1)
+
+ggplot(data=subset_fault_1) +
+  geom_point(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type)) +
+  geom_jitter(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type), alpha=I(0.1)) +
+  labs(x = "Hydraulic_Pressure ()", y = "Active Power (kW)", color = "Fault Status") +
+  ggtitle("Hydraulic Pressure vs Active Power") +
+  theme_bw() +
+  scale_x_continuous(limits = c(175, 240))
+
+  
+
+
 ## bar chart of fault codes for turbine 7
 # Count of total fault codes grouped by description
 agg_fault <- data_7_faults %>%
@@ -134,14 +157,8 @@ agg_fault %>%
       scale_y_continuous(limits=c(0,200000), breaks=c(0, 25000, 50000, 75000, 100000, 125000, 150000, 175000, 200000)) +
       coord_flip() + theme_bw()
 
-#### -------- Ambient Temp and Gearbox Temp
-# Graph looking at Active Power and Delta Temp
-ggplot(data=data_7) +
-  geom_point(aes(x=delta_temp, y = Active_Power, color = Fault_Type)) +
-  geom_jitter(aes(x=delta_temp, y = Active_Power, color = Fault_Type), alpha=I(0.3)) +
-  labs(x = "Delta Temperature (Ambient & Gearbox) (ºC)", y = "Active Power (kW)", color = "Fault Type") +
-  ggtitle("Delta Temp vs Active Power") +
-  theme_bw()
+
+
 
 ## SCATTER PLOT NOTES
 # scatterplots - zoom in on the main trends in the scatterplots. Sometimes the default x/y limits aren’t ideal 
