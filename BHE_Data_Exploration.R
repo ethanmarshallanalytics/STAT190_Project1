@@ -10,6 +10,7 @@ library(GGally)
 library(plotly)
 library(scales)
 #install.packages("fuzzyjoin")
+library(fuzzyjoin)
 
 ## DATA PREP -------
 # Read in Clean Data
@@ -20,6 +21,11 @@ clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
 
 # Read in work order data
 wo = read.csv("Project1Data/work order scrubbed.csv")
+
+wo <- wo %>% 
+  filter(component_type != "null")
+
+
 
 # filter data to only include Turbine 7
 data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
@@ -132,7 +138,7 @@ subset_fault_1 <- subset(data_7, Is_Fault == 1)
 ggplot(data=subset_fault_1) +
   geom_point(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type)) +
   geom_jitter(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type), alpha=I(0.1)) +
-  labs(x = "Hydraulic_Pressure ()", y = "Active Power (kW)", color = "Fault Status") +
+  labs(x = "Hydraulic_Pressure (bar)", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Hydraulic Pressure vs Active Power") +
   theme_bw() +
   scale_x_continuous(limits = c(175, 240))
