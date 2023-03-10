@@ -11,6 +11,8 @@ library(plotly)
 library(scales)
 #install.packages("fuzzyjoin")
 library(fuzzyjoin)
+# install.packages("hrbrthemes")
+library(hrbrthemes)
 
 ## DATA PREP -------
 # Read in Clean Data
@@ -34,6 +36,9 @@ data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
 data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "1")
 data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "0")
 
+# ONLY FOR HEATMAPS: change Is_Fault back to integer
+data_7$Is_Fault <- as.character(data_7$Is_Fault)
+
 # filter data to only include Turbine 12
 # MAYBE EXPAND ON THIS FOR FURTHER ANALYSIS
 data_12 <- clean_data %>% filter(Turbine == "Turbine 12")
@@ -48,16 +53,17 @@ data_7_sub <- filter(data_7, Date > "2022-01-01")
 
 # subset to sensor data columns
 Vars = data.frame(data_7_sub$Oil_Temp, data_7_sub$Generator_RPM, data_7_sub$Wind_Speed, 
-                  data_7_sub$Gearbox_Temp, data_7_sub$Active_Power, data_7_sub$Ambient_Temp)
+                  data_7_sub$Gearbox_Temp, data_7_sub$Active_Power, data_7_sub$Ambient_Temp,
+                  data_7_sub$Hydraulic_Pressure)
 
 # rename columns to something cleaner
-Vars = Vars %>% 
-  rename("Oil_Temp" = "data_7_sub.Oil_Temp",
-         "Generator_RPM" = "data_7_sub.Generator_RPM", 
-         "Wind_Speed" = "data_7_sub.Wind_Speed",
-         "Gearbox_Temp" = "data_7_sub.Gearbox_Temp",
-         "Active_Power" = "data_7_sub.Active_Power",
-         "Ambient_Temp" = "data_7_sub.Ambient_Temp")
+# Vars = Vars %>% 
+#   rename("Oil_Temp" = "data_7_sub.Oil_Temp",
+#          "Generator_RPM" = "data_7_sub.Generator_RPM", 
+#          "Wind_Speed" = "data_7_sub.Wind_Speed",
+#          "Gearbox_Temp" = "data_7_sub.Gearbox_Temp",
+#          "Active_Power" = "data_7_sub.Active_Power",
+#          "Ambient_Temp" = "data_7_sub.Ambient_Temp")
 
 ## Correlation Matrix
 cor(cbind(Vars), use="pairwise.complete.obs")
@@ -77,7 +83,7 @@ ggplotly(p)
 
 #### TURBINE 7
 ## 1) Active Power & Generator RPM
-ggplot(data=data_7) +
+ggplot(data=data_7_faults) +
   geom_point(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault)) +
   geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Generator RPM", y = "Active Power (kW)", color = "Fault Status") +
@@ -92,6 +98,14 @@ ggplot(data=clean_data) +
   facet_wrap(~ Turbine, ncol = 2) +  # add facet by turbine
   theme_bw()
 
+# heatmap plot
+ggplot(data=data_7, aes(x=Generator_RPM, y=Active_Power, fill=Is_Fault)) +
+  # geom_bin2d(bins=100) +
+  geom_tile(position="jitter", height=40, width=22, alpha=I(0.3)) +
+  scale_fill_manual(values = c("Blue", "Orange")) +
+  labs(x = "Generator RPM", y = "Active Power (kW)", fill = "Fault Status") +
+  ggtitle("Active Power vs. Generator RPM") +
+  theme_bw()
 
 ## 2) Gearbox Temp and Active Power
 ggplot(data = data_7) +
@@ -153,26 +167,26 @@ ggplot(data=subset_fault_1) +
   theme_bw() +
   scale_x_continuous(limits = c(175, 240))
 
-  
+
 
 
 ## bar chart of fault codes for turbine 7
 # Count of total fault codes grouped by description
 agg_fault <- data_7_faults %>%
-    group_by(Fault_Code, Fault_Description) %>%
-    summarise(total_count = n(), .groups = 'drop') %>%
-    as.data.frame()
+  group_by(Fault_Code, Fault_Description) %>%
+  summarise(total_count = n(), .groups = 'drop') %>%
+  as.data.frame()
 
 # Only select the top 5 fault descriptions
 agg_fault %>%
   arrange(desc(total_count)) %>%
-    slice(1:5) %>%
-      ggplot(., aes(x=Fault_Description, y=total_count)) +
-      geom_bar(stat='identity') + 
-      labs(x="Fault Description", y="Frequency") +
-      ggtitle("Top 5 Most Frequent Fault Descriptions for Turbine 7") +
-      scale_y_continuous(limits=c(0,200000), breaks=c(0, 25000, 50000, 75000, 100000, 125000, 150000, 175000, 200000)) +
-      coord_flip() + theme_bw()
+  slice(1:5) %>%
+  ggplot(., aes(x=Fault_Description, y=total_count)) +
+  geom_bar(stat='identity') + 
+  labs(x="Fault Description", y="Frequency") +
+  ggtitle("Top 5 Most Frequent Fault Descriptions for Turbine 7") +
+  scale_y_continuous(limits=c(0,200000), breaks=c(0, 25000, 50000, 75000, 100000, 125000, 150000, 175000, 200000)) +
+  coord_flip() + theme_bw()
 
 
 
