@@ -22,13 +22,15 @@ clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 clean_data$Is_Fault <- as.character(clean_data$Is_Fault)
 
 # Read in work order 
-wo1 = read.csv("Project1Data/wo1.csv")
 wo = read.csv("Project1Data/work order scrubbed.csv")
 
-#wo1 <- wo %>% 
-# filter(component_type != "null")
+# wo1 <- wo %>%
+#   filter(component_type != "null")
+# 
+# write.csv(wo1, "Project1Data/wo1.csv")
 
-#write.csv(wo1, "Project1Data/wo1.csv")
+# Read in filtered work order
+wo1 = read.csv("Project1Data/wo1.csv")
 
 
 # filter data to only include Turbine 7
@@ -36,12 +38,11 @@ data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
 data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "1")
 data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "0")
 
-# ONLY FOR HEATMAPS: change Is_Fault back to integer
-data_7$Is_Fault <- as.character(data_7$Is_Fault)
-
 # filter data to only include Turbine 12
 # MAYBE EXPAND ON THIS FOR FURTHER ANALYSIS
 data_12 <- clean_data %>% filter(Turbine == "Turbine 12")
+data_12_faults <- clean_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "1")
+data_12_no_faults <- clean_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "0")
 
 # look at data tables
 View(clean_data)
@@ -83,9 +84,11 @@ ggplotly(p)
 
 #### TURBINE 7
 ## 1) Active Power & Generator RPM
-ggplot(data=data_7_faults) +
+ggplot(data=data_7) +
   geom_point(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault)) +
   geom_jitter(aes(x=Generator_RPM, y = Active_Power, color = Is_Fault), alpha=I(0.3)) +
+  geom_text(aes(x=Generator_RPM, y = Active_Power, label = ifelse(Fault_Description == "Geninv: 139 U-Phase Sharing", "139 U-Phase Fault", ""))) +
+  scale_fill_manual(values = c("Blue", "Orange")) +
   labs(x = "Generator RPM", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Active Power vs. Generator RPM") +
   theme_bw()
@@ -157,38 +160,71 @@ ggplot(data=data_7) +
   theme_bw()
 
 # 8) Hydraulic Pressure & Active Power ------
-subset_fault_1 <- subset(data_7, Is_Fault == 1)
+subset_fault_1 <- subset(data_7, Is_Fault == "1")
 
 ggplot(data=subset_fault_1) +
   geom_point(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type)) +
   geom_jitter(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type), alpha=I(0.1)) +
-  labs(x = "Hydraulic_Pressure (bar)", y = "Active Power (kW)", color = "Fault Status") +
+  labs(x = "Hydraulic Pressure (bar)", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Hydraulic Pressure vs Active Power") +
   theme_bw() +
   scale_x_continuous(limits = c(175, 240))
 
 
-
-
-## bar chart of fault codes for turbine 7
-# Count of total fault codes grouped by description
-agg_fault <- data_7_faults %>%
-  group_by(Fault_Code, Fault_Description) %>%
-  summarise(total_count = n(), .groups = 'drop') %>%
+# count of Fault occurrances aggregated by turbine
+agg_fault <- clean_data %>%
+  filter(Is_Fault == "1") %>%
+  group_by(Turbine) %>%
+  summarise(sensor_count = n()) %>%
   as.data.frame()
+# Turbine 7, 12, 14, 13, 15 have the most fault occurrences
 
-# Only select the top 5 fault descriptions
-agg_fault %>%
-  arrange(desc(total_count)) %>%
-  slice(1:5) %>%
-  ggplot(., aes(x=Fault_Description, y=total_count)) +
-  geom_bar(stat='identity') + 
-  labs(x="Fault Description", y="Frequency") +
-  ggtitle("Top 5 Most Frequent Fault Descriptions for Turbine 7") +
-  scale_y_continuous(limits=c(0,200000), breaks=c(0, 25000, 50000, 75000, 100000, 125000, 150000, 175000, 200000)) +
-  coord_flip() + theme_bw()
+# Function for summarizing fault codes
+fault_summary <- function(turbine) {
+  faults <- clean_data %>% filter(Turbine == turbine & Is_Fault == "1")
+  faults %>%
+    group_by(Fault_Code, Fault_Description) %>%
+      summarise(total_count = n(), .groups = 'drop') %>%
+        as.data.frame()
+}
+# Run function on five most populous turbines
+agg_fault_7 <- fault_summary("Turbine 7")
+agg_fault_12 <- fault_summary("Turbine 12")
+agg_fault_14 <- fault_summary("Turbine 14")
+agg_fault_13 <- fault_summary("Turbine 13")
+agg_fault_15 <- fault_summary("Turbine 15")
+
+# Function for plotting top 5 fault descriptions
+top_5_faults <- function(data, turbine) {
+  data %>%
+    arrange(desc(total_count)) %>%
+    slice(1:5) %>%
+    ggplot(., aes(x=Fault_Description, y=total_count)) +
+    geom_bar(stat='identity') + 
+    labs(x="Fault Description", y="Frequency") +
+    ggtitle(paste0("Top 5 Most Frequent Fault Descriptions for ", turbine)) +
+    coord_flip() + 
+    theme_bw()
+}
+# Run function on five most populous turbines
+top_5_faults(agg_fault_7, "Turbine 7")
+top_5_faults(agg_fault_12, "Turbine 12")
+top_5_faults(agg_fault_14, "Turbine 14")
+top_5_faults(agg_fault_13, "Turbine 13")
+top_5_faults(agg_fault_15, "Turbine 15")
+
+# fault subsets
+u_phase <- subset(data_7, Fault_Description == "Geninv: 139 U-Phase Sharing")
+low_grease <- subset(data_7, Fault_Description == "Grease Level Low, Hub")
+no_lube <- subset(data_12, Fault_Description == "No Lubrication, Gen Bearings")
 
 
+# # scatter plot of Generator_RPM and Active_Power for U-Phase Sharing data
+# ggplot(data=u_phase, aes(x=Generator_RPM, y=delta_temp)) +
+#   geom_point() +
+#   labs(x = "Generator RPM", y = "Delta Temperature (Ambient & Gearbox) (ºC)") +
+#   ggtitle("Active Power vs. Delta Temperature for U-Phase Sharing Faults") +
+#   theme_bw()
 
 
 ## SCATTER PLOT NOTES
@@ -202,12 +238,3 @@ agg_fault %>%
 
 ## HEATMAP RESOURCE
 # https://r-graph-gallery.com/79-levelplot-with-ggplot2.html
-
-
-## GLM ------
-# Build a model to predict the probability of a fault code occurring
-# Build a model to predict the probability of a work order
-
-
-## EDGE CASE ANALYSIS ----
-# Determine what causes fault codes for outlier data points
