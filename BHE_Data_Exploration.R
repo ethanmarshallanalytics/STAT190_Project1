@@ -32,17 +32,18 @@ wo = read.csv("Project1Data/work order scrubbed.csv")
 # Read in filtered work order
 wo1 = read.csv("Project1Data/wo1.csv")
 
-
 # filter data to only include Turbine 7
 data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
 data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "1")
 data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "0")
 
 # filter data to only include Turbine 12
-# MAYBE EXPAND ON THIS FOR FURTHER ANALYSIS
 data_12 <- clean_data %>% filter(Turbine == "Turbine 12")
 data_12_faults <- clean_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "1")
 data_12_no_faults <- clean_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "0")
+
+# filter data to only include Turbine 14
+data_14 <- clean_data %>% filter(Turbine == "Turbine 14")
 
 # look at data tables
 View(clean_data)
@@ -50,10 +51,10 @@ View(wo)
 
 ## UNI- AND MULTI-VARIATE PLOTS ------------
 # further subset Turbine 7 data to only include data since Jan 1, 2022
-data_7_sub <- filter(data_7, Date > "2022-01-01")
+data_7_sub <- filter(data_7, Date > "2022-03-01")
 
 # subset to sensor data columns
-Vars = data.frame(data_7_sub$Oil_Temp, data_7_sub$Generator_RPM, data_7_sub$Wind_Speed, 
+Vars = data.frame(data_7_sub$Oil_Temp, data_7_sub$Generator_RPM, data_7_sub$Wind_Speed,
                   data_7_sub$Gearbox_Temp, data_7_sub$Active_Power, data_7_sub$Ambient_Temp,
                   data_7_sub$Hydraulic_Pressure)
 
@@ -160,17 +161,15 @@ ggplot(data=data_7) +
   theme_bw()
 
 # 8) Hydraulic Pressure & Active Power ------
-subset_fault_1 <- subset(data_7, Is_Fault == "1")
+subset_fault_1 <- subset(clean_data, Is_Fault == "1")
 
-ggplot(data=subset_fault_1) +
-  geom_point(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type)) +
-  geom_jitter(aes(x=Hydraulic_Pressure, y = Active_Power, color = Fault_Type), alpha=I(0.1)) +
+ggplot(data=data_7, aes(x=Hydraulic_Pressure, y = Active_Power, color = Is_Fault)) +
+  geom_point() +
+  geom_jitter(alpha=I(0.1)) +
   labs(x = "Hydraulic Pressure (bar)", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Hydraulic Pressure vs Active Power") +
-  theme_bw() +
-  scale_x_continuous(limits = c(175, 240))
-
-
+  theme_bw()
+  
 # count of Fault occurrances aggregated by turbine
 agg_fault <- clean_data %>%
   filter(Is_Fault == "1") %>%
@@ -215,9 +214,41 @@ top_5_faults(agg_fault_15, "Turbine 15")
 
 # fault subsets
 u_phase <- subset(data_7, Fault_Description == "Geninv: 139 U-Phase Sharing")
-low_grease <- subset(data_7, Fault_Description == "Grease Level Low, Hub")
 no_lube <- subset(data_12, Fault_Description == "No Lubrication, Gen Bearings")
+water_temp <- subset(data_14, Fault_Description == "Inv. Cooling Water Temp Warning")
 
+
+# subset to sensor data columns
+Vars1 = data.frame(u_phase$Oil_Temp, u_phase$Generator_RPM, u_phase$Wind_Speed, 
+                  u_phase$Gearbox_Temp, u_phase$Active_Power, u_phase$Ambient_Temp,
+                  u_phase$Hydraulic_Pressure)
+## Correlation Matrix
+cor(cbind(Vars1), use="pairwise.complete.obs")
+
+# scatter plot of Hydraulic Pressure and Active Power
+ggplot(data=u_phase, aes(x=Hydraulic_Pressure, y=Active_Power)) +
+  geom_point(color="Dark Orange") +
+  labs(x = "Generator RPM", y = "Active Power (kW)") +
+  ggtitle("Active Power vs. Generator RPM U-Phase Faults") +
+  theme_bw()
+
+ggplot(data=data_7_no_faults, aes(x=Hydraulic_Pressure, y=Active_Power)) +
+  geom_point(color="Dark Blue") +
+  labs(x = "Generator RPM", y = "Active Power (kW)") +
+  ggtitle("Active Power vs. Generator RPM No Faults") +
+  theme_bw()
+
+ggplot(data=u_phase, aes(x=Oil_Temp, y=Gearbox_Temp)) +
+  geom_point(color="Dark Orange") +
+  labs(x = "Oil Temperature (ºC)", y = "Gearbox Temperature (ºC)") +
+  ggtitle("Gearbox vs. Oil Temperature (ºC) U-Phase Faults") +
+  theme_bw()
+
+ggplot(data=data_7_no_faults, aes(x=Oil_Temp, y=Gearbox_Temp)) +
+  geom_point(color="Dark Blue") +
+  labs(x = "Oil Temperature (ºC)", y = "Gearbox Temperature (ºC)") +
+  ggtitle("Gearbox vs. Oil Temperature (ºC) No Faults") +
+  theme_bw()
 
 # # scatter plot of Generator_RPM and Active_Power for U-Phase Sharing data
 # ggplot(data=u_phase, aes(x=Generator_RPM, y=delta_temp)) +
