@@ -54,9 +54,18 @@ View(wo)
 data_7_sub <- filter(data_7, Date > "2022-03-01")
 
 # subset to sensor data columns
-Vars = data.frame(data_7_sub$Oil_Temp, data_7_sub$Generator_RPM, data_7_sub$Wind_Speed,
-                  data_7_sub$Gearbox_Temp, data_7_sub$Active_Power, data_7_sub$Ambient_Temp,
+Vars = data.frame(data_7_sub$Oil_Temp, 
+                  data_7_sub$Generator_RPM,
+                  data_7_sub$Gearbox_Temp, 
+                  data_7_sub$Active_Power, 
                   data_7_sub$Hydraulic_Pressure)
+
+Vars <- Vars %>%
+  rename("Oil_Temp" = "data_7_sub.Oil_Temp", 
+         "Generator_RPM" = "data_7_sub.Generator_RPM",
+        "Gearbox_Temp" = "data_7_sub.Gearbox_Temp", 
+        "Active_Power" = "data_7_sub.Active_Power", 
+        "Hydraulic_Pressure" = "data_7_sub.Hydraulic_Pressure")
 
 # rename columns to something cleaner
 # Vars = Vars %>% 
@@ -71,7 +80,8 @@ Vars = data.frame(data_7_sub$Oil_Temp, data_7_sub$Generator_RPM, data_7_sub$Wind
 cor(cbind(Vars), use="pairwise.complete.obs")
 
 ## Scatter plot matrix
-p <- ggpairs(Vars, title="Sensor Data Scatter Plot Matrix") 
+p <- ggpairs(Vars, title="Sensor Data Scatter Plot Matrix")
+ggsave(p)
 ggplotly(p)
 
 
