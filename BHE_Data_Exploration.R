@@ -51,21 +51,21 @@ View(wo)
 
 ## UNI- AND MULTI-VARIATE PLOTS ------------
 # further subset Turbine 7 data to only include data since Jan 1, 2022
-data_7_sub <- filter(data_7, Date > "2022-03-01")
+clean_sub <- filter(clean_data, Date > "2022-07-01")
 
 # subset to sensor data columns
-Vars = data.frame(data_7_sub$Oil_Temp, 
-                  data_7_sub$Generator_RPM,
-                  data_7_sub$Gearbox_Temp, 
-                  data_7_sub$Active_Power, 
-                  data_7_sub$Hydraulic_Pressure)
+Vars = data.frame(clean_sub$Oil_Temp, 
+                  clean_sub$Generator_RPM,
+                  clean_sub$Gearbox_Temp, 
+                  clean_sub$Active_Power, 
+                  clean_sub$Hydraulic_Pressure)
 
 Vars <- Vars %>%
-  rename("Oil_Temp" = "data_7_sub.Oil_Temp", 
-         "Generator_RPM" = "data_7_sub.Generator_RPM",
-        "Gearbox_Temp" = "data_7_sub.Gearbox_Temp", 
-        "Active_Power" = "data_7_sub.Active_Power", 
-        "Hydraulic_Pressure" = "data_7_sub.Hydraulic_Pressure")
+  rename("Oil_Temp" = "clean_sub.Oil_Temp", 
+         "Generator_RPM" = "clean_sub.Generator_RPM",
+        "Gearbox_Temp" = "clean_sub.Gearbox_Temp", 
+        "Active_Power" = "clean_sub.Active_Power", 
+        "Hydraulic_Pressure" = "clean_sub.Hydraulic_Pressure")
 
 # rename columns to something cleaner
 # Vars = Vars %>% 
@@ -80,8 +80,8 @@ Vars <- Vars %>%
 cor(cbind(Vars), use="pairwise.complete.obs")
 
 ## Scatter plot matrix
+## TODO: add coloring for fault
 p <- ggpairs(Vars, title="Sensor Data Scatter Plot Matrix")
-ggsave(p)
 ggplotly(p)
 
 
