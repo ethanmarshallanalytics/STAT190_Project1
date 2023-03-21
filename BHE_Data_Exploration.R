@@ -1,3 +1,4 @@
+## LIBRARIES AND PACKAGES -----
 rm(list = ls())
 library(dplyr)
 library(tidyverse)
@@ -51,21 +52,23 @@ View(wo)
 
 ## UNI- AND MULTI-VARIATE PLOTS ------------
 # further subset Turbine 7 data to only include data since Jan 1, 2022
-clean_sub <- filter(clean_data, Date > "2022-07-01")
+data_7_sub <- filter(data_7, Date > "2022-03-01")
 
 # subset to sensor data columns
-Vars = data.frame(clean_sub$Oil_Temp, 
-                  clean_sub$Generator_RPM,
-                  clean_sub$Gearbox_Temp, 
-                  clean_sub$Active_Power, 
-                  clean_sub$Hydraulic_Pressure)
+Vars = data.frame(data_7_sub$Oil_Temp, 
+                  data_7_sub$Generator_RPM,
+                  data_7_sub$Gearbox_Temp, 
+                  data_7_sub$Active_Power, 
+                  data_7_sub$Hydraulic_Pressure,
+                  data_7_sub$Is_Fault)
 
 Vars <- Vars %>%
-  rename("Oil_Temp" = "clean_sub.Oil_Temp", 
-         "Generator_RPM" = "clean_sub.Generator_RPM",
-        "Gearbox_Temp" = "clean_sub.Gearbox_Temp", 
-        "Active_Power" = "clean_sub.Active_Power", 
-        "Hydraulic_Pressure" = "clean_sub.Hydraulic_Pressure")
+  rename("Oil_Temp" = "data_7_sub.Oil_Temp", 
+         "Generator_RPM" = "data_7_sub.Generator_RPM",
+         "Gearbox_Temp" = "data_7_sub.Gearbox_Temp", 
+         "Active_Power" = "data_7_sub.Active_Power", 
+         "Hydraulic_Pressure" = "data_7_sub.Hydraulic_Pressure",
+         "Is_Fault" = "data_7_sub.Is_Fault")
 
 # rename columns to something cleaner
 # Vars = Vars %>% 
@@ -80,8 +83,9 @@ Vars <- Vars %>%
 cor(cbind(Vars), use="pairwise.complete.obs")
 
 ## Scatter plot matrix
-## TODO: add coloring for fault
-p <- ggpairs(Vars, title="Sensor Data Scatter Plot Matrix")
+p <- ggpairs(Vars, 
+             columns = 1:5,
+             aes(color=Is_Fault, alpha=0.2))
 ggplotly(p)
 
 
@@ -112,7 +116,7 @@ ggplot(data=clean_data) +
   facet_wrap(~ Turbine, ncol = 2) +  # add facet by turbine
   theme_bw()
 
-# heatmap plot
+# Active Power & Generator RPM heatmap plot
 ggplot(data=data_7, aes(x=Generator_RPM, y=Active_Power, fill=Is_Fault)) +
   # geom_bin2d(bins=100) +
   geom_tile(position="jitter", height=40, width=22, alpha=I(0.3)) +
@@ -134,6 +138,15 @@ ggplot(data=data_7) +
   geom_point(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault)) +
   geom_jitter(aes(x=Generator_RPM, y = Oil_Temp, color = Is_Fault), alpha=I(0.3)) +
   labs(x = "Generator RPM", y = "Oil Temperature (ºC)", color = "Fault Status") +
+  ggtitle("Oil Temperature vs. Generator RPM") +
+  theme_bw()
+
+# Generator RPM & Oil Temp heatmap
+ggplot(data=data_7, aes(x=Generator_RPM, y = Oil_Temp, fill = Is_Fault)) +
+  geom_tile(position="jitter", height=1, width=15, alpha=I(0.3)) +
+  scale_fill_manual(values = c("Blue", "Orange")) +
+  labs(x = "Generator RPM", y = "Oil Temperature (ºC)", fill = "Fault Status") +
+  scale_y_continuous(limits = c(20,80), breaks=c(20,30,40,50,60,70,80)) +
   ggtitle("Oil Temperature vs. Generator RPM") +
   theme_bw()
 
@@ -161,8 +174,17 @@ ggplot(data=data_7) +
   ggtitle("Wind Speed vs Active Power") +
   theme_bw()
 
-# 7) Ambient Temp and Gearbox Temp ----
-# Graph looking at Active Power and Delta Temp
+# Windspeed and Active Power heatmap
+ggplot(data=data_7, aes(x=Wind_Speed, y = Active_Power, fill = Is_Fault)) +
+  geom_tile(position="jitter", height=40, width=0.2, alpha=I(0.3)) +
+  scale_fill_manual(values = c("Blue", "Orange")) +
+  labs(x = "Wind Speed (m/s)", y = "Active Power (kW)", fill = "Fault Status") +
+  scale_x_continuous(limits = c(20,30), breaks=c(20,22,24,26,28,30)) +
+  ggtitle("Active Power vs. Wind Speed") +
+  theme_bw()
+
+## 7) Delta Temp and Active Power
+# Delta Temp = ABS(Ambient_Temp - Gearbox_Temp)
 ggplot(data=data_7) +
   geom_point(aes(x=delta_temp, y = Active_Power, color = Fault_Type)) +
   geom_jitter(aes(x=delta_temp, y = Active_Power, color = Fault_Type), alpha=I(0.3)) +
@@ -170,7 +192,7 @@ ggplot(data=data_7) +
   ggtitle("Delta Temp vs Active Power") +
   theme_bw()
 
-# 8) Hydraulic Pressure & Active Power ------
+## 8) Hydraulic Pressure & Active Power
 subset_fault_1 <- subset(clean_data, Is_Fault == "1")
 
 ggplot(data=data_7, aes(x=Hydraulic_Pressure, y = Active_Power, color = Is_Fault)) +
@@ -179,7 +201,8 @@ ggplot(data=data_7, aes(x=Hydraulic_Pressure, y = Active_Power, color = Is_Fault
   labs(x = "Hydraulic Pressure (bar)", y = "Active Power (kW)", color = "Fault Status") +
   ggtitle("Hydraulic Pressure vs Active Power") +
   theme_bw()
-  
+
+#### AGGREGATED DATA AND SUMMARY ANALYSIS -----
 # count of Fault occurrances aggregated by turbine
 agg_fault <- clean_data %>%
   filter(Is_Fault == "1") %>%
@@ -193,8 +216,8 @@ fault_summary <- function(turbine) {
   faults <- clean_data %>% filter(Turbine == turbine & Is_Fault == "1")
   faults %>%
     group_by(Fault_Code, Fault_Description) %>%
-      summarise(total_count = n(), .groups = 'drop') %>%
-        as.data.frame()
+    summarise(total_count = n(), .groups = 'drop') %>%
+    as.data.frame()
 }
 # Run function on five most populous turbines
 agg_fault_7 <- fault_summary("Turbine 7")
@@ -230,8 +253,8 @@ water_temp <- subset(data_14, Fault_Description == "Inv. Cooling Water Temp Warn
 
 # subset to sensor data columns
 Vars1 = data.frame(u_phase$Oil_Temp, u_phase$Generator_RPM, u_phase$Wind_Speed, 
-                  u_phase$Gearbox_Temp, u_phase$Active_Power, u_phase$Ambient_Temp,
-                  u_phase$Hydraulic_Pressure)
+                   u_phase$Gearbox_Temp, u_phase$Active_Power, u_phase$Ambient_Temp,
+                   u_phase$Hydraulic_Pressure)
 ## Correlation Matrix
 cor(cbind(Vars1), use="pairwise.complete.obs")
 
@@ -268,6 +291,7 @@ ggplot(data=data_7_no_faults, aes(x=Oil_Temp, y=Gearbox_Temp)) +
 #   theme_bw()
 
 
+##### OTHER NOTES -----
 ## SCATTER PLOT NOTES
 # scatterplots - zoom in on the main trends in the scatterplots. Sometimes the default x/y limits aren’t ideal 
 # scatterplots - find ways to deal with over plotting (alpha blending, faceting, heatmaps)
