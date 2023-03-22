@@ -34,9 +34,9 @@ wo = read.csv("Project1Data/work order scrubbed.csv")
 wo1 = read.csv("Project1Data/wo1.csv")
 
 # filter data to only include Turbine 7
-data_7 <- clean_data %>% filter(Turbine == "Turbine 7")
-data_7_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "1")
-data_7_no_faults <- clean_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "0")
+data_7 <- plotting_data %>% filter(Turbine == "Turbine 7")
+data_7_faults <- plotting_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "1")
+data_7_no_faults <- plotting_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "0")
 
 # filter data to only include Turbine 12
 data_12 <- clean_data %>% filter(Turbine == "Turbine 12")
@@ -117,13 +117,20 @@ ggplot(data=clean_data) +
   theme_bw()
 
 # Active Power & Generator RPM heatmap plot
-ggplot(data=data_7, aes(x=Generator_RPM, y=Active_Power, fill=Is_Fault)) +
-  # geom_bin2d(bins=100) +
-  geom_tile(position="jitter", height=40, width=22, alpha=I(0.3)) +
-  scale_fill_manual(values = c("Blue", "Orange")) +
-  labs(x = "Generator RPM", y = "Active Power (kW)", fill = "Fault Status") +
-  ggtitle("Active Power vs. Generator RPM") +
+# fault data
+ggplot(data=subset(data_7_faults, Active_Power<2000 & Generator_RPM<1400), aes(x=Generator_RPM, y=Active_Power)) +
+  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(25,30)) +
+  labs(x = "Generator RPM", y = "Active Power (kW)") +
+  ggtitle("Active Power vs. Generator RPM Faults") +
   theme_bw()
+
+# no fault data
+ggplot(data=subset(data_7_no_faults, Active_Power<2000 & Generator_RPM<1400), aes(x=Generator_RPM, y=Active_Power)) +
+  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(25,30)) +
+  labs(x = "Generator RPM", y = "Active Power (kW)") +
+  ggtitle("Active Power vs. Generator RPM No Faults") +
+  theme_bw()
+
 
 ## 2) Gearbox Temp and Active Power
 ggplot(data = data_7) +
@@ -212,6 +219,7 @@ agg_fault <- clean_data %>%
 # Turbine 7, 12, 14, 13, 15 have the most fault occurrences
 
 # Function for summarizing fault codes
+# Turbine is a string of the turbine name
 fault_summary <- function(turbine) {
   faults <- clean_data %>% filter(Turbine == turbine & Is_Fault == "1")
   faults %>%
@@ -227,6 +235,8 @@ agg_fault_13 <- fault_summary("Turbine 13")
 agg_fault_15 <- fault_summary("Turbine 15")
 
 # Function for plotting top 5 fault descriptions
+# data is an aggregated dataset for turbines
+# turbine is a string of a turbine name
 top_5_faults <- function(data, turbine) {
   data %>%
     arrange(desc(total_count)) %>%

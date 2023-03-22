@@ -3,6 +3,8 @@ library(dplyr)
 library(tidyverse)
 library(forcats)
 library(lubridate)
+# install.packages("naniar")
+library(naniar)
 
 ### ORIGINAL DATA -------
 # read in windspeed.csv
@@ -270,3 +272,23 @@ clean_data$Is_Fault <- ifelse(clean_data$Fault_Description %in%
 
 # write to a fresh CSV file
 write.csv(clean_data, "Project1Data/clean_BHE_data.csv", row.names=F)
+
+## REMOVE IMPUTED VALUES IN NEW DATA SET -----
+clean_data = read.csv("Project1Data/clean_BHE_data.csv")
+
+# create copy of dataset
+plotting_data = clean_data
+
+# replace imputed values with null
+plotting_data = plotting_data %>%
+  replace_with_na(replace = list(Oil_Temp = median(plotting_data$Oil_Temp),
+                                 Generator_RPM = median(plotting_data$Generator_RPM),
+                                 Wind_Speed = median(plotting_data$Wind_Speed),
+                                 Gearbox_Temp = median(plotting_data$Gearbox_Temp),
+                                 Active_Power = median(plotting_data$Active_Power),
+                                 Ambient_Temp = median(plotting_data$Ambient_Temp),
+                                 delta_temp = median(plotting_data$delta_temp)))
+
+# write new CSV to a file
+write.csv(plotting_data, "Project1Data/plotting_data.csv", row.names=F)
+
