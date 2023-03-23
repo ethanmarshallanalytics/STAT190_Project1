@@ -31,11 +31,11 @@ base_forest = randomForest(Is_Fault ~ Turbine + Fault_Code + Fault_Type + Oil_Te
                         data = train.data,
                         ntree = 1000, # of classification trees in forest
                         mtry = 4,  # SQRT of 12
-                        importance = TRUE)
+                        importance = TRUE) 
 
 # importance = TRUE will help us identify important predictors (later)
 # note: it does make the algorithm slower
-myforest
+base_forest
 
 ### TUNING THE FOREST ----
 # Answering the question: Can a too-high B overfit?
