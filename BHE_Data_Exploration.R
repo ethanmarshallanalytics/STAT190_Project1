@@ -42,13 +42,14 @@ data_7 <- plot_data %>% filter(Turbine == "Turbine 7")
 data_7_faults <- plot_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "1")
 data_7_no_faults <- plot_data %>% filter(Turbine == "Turbine 7" & Is_Fault == "0")
 
-# filter data to only include Turbine 12
-data_12 <- plot_data %>% filter(Turbine == "Turbine 12")
-data_12_faults <- plot_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "1")
-data_12_no_faults <- plot_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "0")
+# # filter data to only include Turbine 12
+# data_12 <- plot_data %>% filter(Turbine == "Turbine 12")
+# data_12_faults <- plot_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "1")
+# data_12_no_faults <- plot_data %>% filter(Turbine == "Turbine 12" & Is_Fault == "0")
 
 # look at data tables
 View(clean_data)
+View(plot_data)
 View(wo)
 
 ## UNI- AND MULTI-VARIATE PLOTS ------------
@@ -70,15 +71,6 @@ Vars <- Vars %>%
          "Active_Power" = "data_7_sub.Active_Power", 
          "Hydraulic_Pressure" = "data_7_sub.Hydraulic_Pressure",
          "Is_Fault" = "data_7_sub.Is_Fault")
-
-# rename columns to something cleaner
-# Vars = Vars %>% 
-#   rename("Oil_Temp" = "data_7_sub.Oil_Temp",
-#          "Generator_RPM" = "data_7_sub.Generator_RPM", 
-#          "Wind_Speed" = "data_7_sub.Wind_Speed",
-#          "Gearbox_Temp" = "data_7_sub.Gearbox_Temp",
-#          "Active_Power" = "data_7_sub.Active_Power",
-#          "Ambient_Temp" = "data_7_sub.Ambient_Temp")
 
 ## Correlation Matrix
 cor(cbind(Vars), use="pairwise.complete.obs")
@@ -198,8 +190,8 @@ ggplot(data=data_7, aes(x=Hydraulic_Pressure, y = Active_Power, color = Is_Fault
 ## FINAL HEATMAP PLOTS ----
 ## Active Power & Generator RPM heatmap plot
 # fault data
-ggplot(data=subset(data_7_faults, Active_Power<2000 & Generator_RPM<1400), aes(x=Generator_RPM, y=Active_Power)) +
-  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(15,30)) +
+ggplot(data=subset(data_7_faults, Active_Power<2000 & Generator_RPM<1400 & Generator_RPM >=100), aes(x=Generator_RPM, y=Active_Power)) +
+  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(10,20)) +
   labs(x = "Generator RPM", y = "Active Power (kW)") +
   scale_x_continuous(breaks = c(200,400,600,800,1000,1200,1400)) +
   scale_fill_continuous(name = "Frequency") +
@@ -207,8 +199,8 @@ ggplot(data=subset(data_7_faults, Active_Power<2000 & Generator_RPM<1400), aes(x
   theme_bw()
 
 # no fault data
-ggplot(data=subset(data_7_no_faults, Active_Power<2000 & Generator_RPM<1400), aes(x=Generator_RPM, y=Active_Power)) +
-  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(15,30)) +
+ggplot(data=subset(data_7_no_faults, Active_Power<2000 & Generator_RPM<1400 & Generator_RPM >=100), aes(x=Generator_RPM, y=Active_Power)) +
+  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(10,20)) +
   labs(x = "Generator RPM", y = "Active Power (kW)") +
   scale_x_continuous(breaks = c(200,400,600,800,1000,1200,1400)) +
   scale_fill_continuous(name = "Frequency") +
@@ -234,30 +226,13 @@ ggplot(data=subset(data_7_no_faults, Generator_RPM<1400 & Generator_RPM>=100), a
   ggtitle("Gearbox Temperature vs. Generator RPM -- NO FAULTS") +
   theme_bw()
 
-## Oil Temp and Hydraulic Pressure
-# fault data
-ggplot(data=subset(data_7_faults, Hydraulic_Pressure<=225), aes(x=Oil_Temp, y=Hydraulic_Pressure)) +
-  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(1,6)) +
-  labs(x = "Oil Temperature (ºC)", y = "Hydraulic Pressure (bar)") +
-  scale_fill_continuous(name = "Frequency") +
-  ggtitle("Hydraulic Pressure vs. Oil Temperature-- FAULTS") +
-  theme_bw()
-
-# no fault data
-ggplot(data=subset(data_7_no_faults, Hydraulic_Pressure<=225), aes(x=Oil_Temp, y=Hydraulic_Pressure)) +
-  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(1,6)) +
-  labs(x = "Oil Temperature (ºC)", y = "Hydraulic Pressure (bar)") +
-  scale_fill_continuous(name = "Frequency") +
-  ggtitle("Gearbox Temperature vs. Generator RPM -- NO FAULTS") +
-  theme_bw()
-
 ## Gearbox Temp and Hydraulic Pressure
 # fault data
 ggplot(data=subset(data_7_faults, Hydraulic_Pressure<=225), aes(x=Gearbox_Temp, y=Hydraulic_Pressure)) +
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(1,4)) +
   labs(x = "Gearbox Temperature (ºC)", y = "Hydraulic Pressure (bar)") +
   scale_fill_continuous(name = "Frequency") +
-  ggtitle("Hydraulic Pressure vs. Gearbox Temperature-- FAULTS") +
+  ggtitle("Hydraulic Pressure vs. Gearbox Temperature -- FAULTS") +
   theme_bw()
 
 # no fault data
@@ -265,7 +240,24 @@ ggplot(data=subset(data_7_no_faults, Hydraulic_Pressure<=225), aes(x=Gearbox_Tem
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(1,4)) +
   labs(x = "Gearbox Temperature (ºC)", y = "Hydraulic Pressure (bar)") +
   scale_fill_continuous(name = "Frequency") +
-  ggtitle("Hydraulic Pressure vs. Gearbox Temperature-- NO FAULTS") +
+  ggtitle("Hydraulic Pressure vs. Gearbox Temperature -- NO FAULTS") +
+  theme_bw()
+
+## Generator RPM and Hydraulic Pressure
+# fault data
+ggplot(data=subset(data_7_faults, Hydraulic_Pressure<224), aes(x=Generator_RPM, y=Hydraulic_Pressure)) +
+  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(20,4)) +
+  labs(x = "Generator_RPM", y = "Hydraulic Pressure (bar)") +
+  scale_fill_continuous(name = "Frequency") +
+  ggtitle("Hydraulic Pressure vs. Generator RPM -- FAULTS") +
+  theme_bw()
+
+# no fault data
+ggplot(data=subset(data_7_no_faults, Hydraulic_Pressure<224), aes(x=Generator_RPM, y=Hydraulic_Pressure)) +
+  stat_bin2d(aes(fill = after_stat(count)), binwidth = c(20,4)) +
+  labs(x = "Generator_RPM", y = "Hydraulic Pressure (bar)") +
+  scale_fill_continuous(name = "Frequency") +
+  ggtitle("Hydraulic Pressure vs. Generator RPM -- NO FAULTS") +
   theme_bw()
 
 #### AGGREGATED DATA AND SUMMARY ANALYSIS -----
@@ -288,10 +280,10 @@ fault_summary <- function(turbine) {
 }
 # Run function on five most populous turbines
 agg_fault_7 <- fault_summary("Turbine 7")
-agg_fault_12 <- fault_summary("Turbine 12")
-agg_fault_14 <- fault_summary("Turbine 14")
-agg_fault_13 <- fault_summary("Turbine 13")
-agg_fault_15 <- fault_summary("Turbine 15")
+# agg_fault_12 <- fault_summary("Turbine 12")
+# agg_fault_14 <- fault_summary("Turbine 14")
+# agg_fault_13 <- fault_summary("Turbine 13")
+# agg_fault_15 <- fault_summary("Turbine 15")
 
 # Function for plotting top 5 fault descriptions
 # data is an aggregated dataset for turbines
@@ -309,56 +301,31 @@ top_5_faults <- function(data, turbine) {
 }
 # Run function on five most populous turbines
 top_5_faults(agg_fault_7, "Turbine 7")
-top_5_faults(agg_fault_12, "Turbine 12")
-top_5_faults(agg_fault_14, "Turbine 14")
-top_5_faults(agg_fault_13, "Turbine 13")
-top_5_faults(agg_fault_15, "Turbine 15")
+# top_5_faults(agg_fault_12, "Turbine 12")
+# top_5_faults(agg_fault_14, "Turbine 14")
+# top_5_faults(agg_fault_13, "Turbine 13")
+# top_5_faults(agg_fault_15, "Turbine 15")
 
 # fault subsets
 u_phase <- subset(data_7, Fault_Description == "Geninv: 139 U-Phase Sharing")
-no_lube <- subset(data_12, Fault_Description == "No Lubrication, Gen Bearings")
-water_temp <- subset(data_14, Fault_Description == "Inv. Cooling Water Temp Warning")
+# gen_bear <- subset(data_12, Fault_Description == "No Lubrication, Gen Bearings")
+# water_temp <- subset(data_14, Fault_Description == "Inv. Cooling Water Temp Warning")
 
-
-# subset to sensor data columns
-Vars1 = data.frame(u_phase$Oil_Temp, u_phase$Generator_RPM, u_phase$Wind_Speed, 
-                   u_phase$Gearbox_Temp, u_phase$Active_Power, u_phase$Ambient_Temp,
-                   u_phase$Hydraulic_Pressure)
-## Correlation Matrix
-cor(cbind(Vars1), use="pairwise.complete.obs")
-
-# scatter plot of Hydraulic Pressure and Active Power
-ggplot(data=u_phase, aes(x=Hydraulic_Pressure, y=Active_Power)) +
+# Active Power and Generator RPM
+ggplot(data=subset(u_phase, Active_Power<2000 & Generator_RPM<1400 & Generator_RPM >=100), aes(x=Generator_RPM, y=Active_Power)) +
   geom_point(color="Dark Orange") +
   labs(x = "Generator RPM", y = "Active Power (kW)") +
   ggtitle("Active Power vs. Generator RPM U-Phase Faults") +
+  scale_x_continuous(breaks=c(200,400,600,800,1000,1200,1400))+
   theme_bw()
 
-ggplot(data=data_7_no_faults, aes(x=Hydraulic_Pressure, y=Active_Power)) +
-  geom_point(color="Dark Blue") +
-  labs(x = "Generator RPM", y = "Active Power (kW)") +
-  ggtitle("Active Power vs. Generator RPM No Faults") +
-  theme_bw()
-
-ggplot(data=u_phase, aes(x=Oil_Temp, y=Gearbox_Temp)) +
+# Gearbox Temperature and Generator RPM
+ggplot(data=subset(u_phase, Generator_RPM<1400 & Generator_RPM>=100), aes(x=Generator_RPM, y=Gearbox_Temp)) +
   geom_point(color="Dark Orange") +
-  labs(x = "Oil Temperature (ºC)", y = "Gearbox Temperature (ºC)") +
-  ggtitle("Gearbox vs. Oil Temperature (ºC) U-Phase Faults") +
+  labs(x = "Generator RPM", y = "Gearbox Temperature (ºC)") +
+  ggtitle("Gearbox Temperature vs. Generator RPM U-Phase Faults") +
+  scale_x_continuous(breaks=c(200,400,600,800,1000,1200,1400))+
   theme_bw()
-
-ggplot(data=data_7_no_faults, aes(x=Oil_Temp, y=Gearbox_Temp)) +
-  geom_point(color="Dark Blue") +
-  labs(x = "Oil Temperature (ºC)", y = "Gearbox Temperature (ºC)") +
-  ggtitle("Gearbox vs. Oil Temperature (ºC) No Faults") +
-  theme_bw()
-
-# # scatter plot of Generator_RPM and Active_Power for U-Phase Sharing data
-# ggplot(data=u_phase, aes(x=Generator_RPM, y=delta_temp)) +
-#   geom_point() +
-#   labs(x = "Generator RPM", y = "Delta Temperature (Ambient & Gearbox) (ºC)") +
-#   ggtitle("Active Power vs. Delta Temperature for U-Phase Sharing Faults") +
-#   theme_bw()
-
 
 ##### OTHER NOTES -----
 ## SCATTER PLOT NOTES
