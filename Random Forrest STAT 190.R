@@ -33,11 +33,11 @@ train.data$Is_Fault <- factor(train.data$Is_Fault)
 test.data = data_7[-train.idx, ]
 
 ## BASELIEN FOREST -----
-base_forest = randomForest(Is_Fault ~ Turbine + Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
+base_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
                            Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                         data = train.data,
                         ntree = 1000, # of classification trees in forest
-                        mtry = 4,  # SQRT of 18
+                        mtry = 3,  # SQRT of 10
                         importance = TRUE) 
 
 # importance = TRUE will help us identify important predictors (later)
@@ -57,7 +57,7 @@ plot(base_forest)
 # tune m actually is important and can affect model performance
 
 # create a sequence of m values we want to try
-mtry = c(1:18) # This can only be the number of x variables
+mtry = c(1:12) # This can only be the number of x variables
 
 #note: you can do each possible number if you have time if you are computationally limited,
 #   see the notes on page 28 for how to choose a more limited list.
