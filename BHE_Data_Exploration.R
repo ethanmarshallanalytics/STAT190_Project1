@@ -262,20 +262,20 @@ ggplot(data=subset(data_7_no_faults, Hydraulic_Pressure<224), aes(x=Generator_RP
 
 #### AGGREGATED DATA AND SUMMARY ANALYSIS -----
 # count of Fault occurrances aggregated by turbine
-agg_fault <- clean_data %>%
+agg_fault <- plot_data %>%
   filter(Is_Fault == "1") %>%
   group_by(Turbine) %>%
-  summarise(sensor_count = n()) %>%
+  summarise(Fault_Count = n()) %>%
   as.data.frame()
 # Turbine 7, 12, 14, 13, 15 have the most fault occurrences
 
 # Function for summarizing fault codes
 # Turbine is a string of the turbine name
 fault_summary <- function(turbine) {
-  faults <- clean_data %>% filter(Turbine == turbine & Is_Fault == "1")
+  faults <- plot_data %>% filter(Turbine == turbine & Is_Fault == "1")
   faults %>%
     group_by(Fault_Code, Fault_Description) %>%
-    summarise(total_count = n(), .groups = 'drop') %>%
+    summarise(Count = n(), .groups = 'drop') %>%
     as.data.frame()
 }
 # Run function on five most populous turbines
@@ -290,12 +290,12 @@ agg_fault_7 <- fault_summary("Turbine 7")
 # turbine is a string of a turbine name
 top_5_faults <- function(data, turbine) {
   data %>%
-    arrange(desc(total_count)) %>%
+    arrange(desc(Count)) %>%
     slice(1:5) %>%
-    ggplot(., aes(x=Fault_Description, y=total_count)) +
+    ggplot(., aes(x=Fault_Description, y=Count)) +
     geom_bar(stat='identity') + 
     labs(x="Fault Description", y="Frequency") +
-    ggtitle(paste0("Top 5 Most Frequent Fault Descriptions for ", turbine)) +
+    ggtitle(paste0("Top 5 Fault Descriptions for ", turbine)) +
     coord_flip() + 
     theme_bw()
 }
@@ -316,7 +316,7 @@ ggplot(data=subset(u_phase, Active_Power<2000 & Generator_RPM<1400 & Generator_R
   geom_point(color="Dark Orange") +
   labs(x = "Generator RPM", y = "Active Power (kW)") +
   ggtitle("Active Power vs. Generator RPM U-Phase Faults") +
-  scale_x_continuous(breaks=c(200,400,600,800,1000,1200,1400))+
+  scale_x_continuous(limits = c(125,1400), breaks=c(200,400,600,800,1000,1200,1400))+
   theme_bw()
 
 # Gearbox Temperature and Generator RPM
