@@ -110,7 +110,7 @@ test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
 View(test.data)
 
 # AUC = 0.892
-# pi* = 0.9015 ... we will only predict a goal when P(scoring) > .9015
+# pi* = 0.9015 ... we will only predict a fault occurring when the P(fault) > .9015
 # Specificity: .789
 # Sensitivity: .980 (VERY VERY GOOD)
 
