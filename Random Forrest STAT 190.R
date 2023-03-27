@@ -37,7 +37,7 @@ base_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Gener
                            Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                         data = train.data,
                         ntree = 1000, # of classification trees in forest
-                        mtry = 3,  # SQRT of 10
+                        mtry = 4,  # SQRT of 10
                         importance = TRUE) 
 
 # importance = TRUE will help us identify important predictors (later)
@@ -57,7 +57,7 @@ plot(base_forest)
 # tune m actually is important and can affect model performance
 
 # create a sequence of m values we want to try
-mtry = c(1:12) # This can only be the number of x variables
+mtry = c(1:10) # This can only be the number of x variables
 
 #note: you can do each possible number if you have time if you are computationally limited,
 #   see the notes on page 28 for how to choose a more limited list.
@@ -70,7 +70,7 @@ keeps = data.frame(m = rep(NA, length(mtry)),
 # create a loop that will fill the keeps data frame
 for(idx in 1:length(mtry)){
   print(paste("Fitting m = ", mtry[idx])) # print out what iteration we are on
-  tempforest = randomForest(Is_Fault ~ Turbine + Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
+  tempforest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
                               Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                             data = train.data,
                             ntree = 1000,
@@ -88,11 +88,30 @@ ggplot(data = keeps) +
 
 
 #Final Forest
-final_forest = randomForest(Is_Fault ~ Turbine + Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
+final_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
                               Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                             data = train.data,
                             ntree = 1000, # of classification trees in forest
-                            mtry = 4,  # SQRT of 12
+                            mtry = 4,  # SQRT of 10
                             importance = TRUE)
 final_forest
+
+## Results ------
+pi_hat = predict(final_forest, test.data, type = "prob")[, "1"] # extract prob of positive event
+rocCurve = roc(response = test.data$Is_Fault,
+               predictor = pi_hat,
+               levels = c("0", "1"))
+plot(rocCurve, print.thres = TRUE, print.auc = TRUE)
+
+pi_star = coords(rocCurve, "best", ret = "threshold")$threshold[1]
+pi_star
+
+test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
+View(test.data)
+
+# AUC = 0.892
+# pi* = 0.9015 ... we will only predict a goal when P(scoring) > .9015
+# Specificity: .789
+# Sensitivity: .980 (VERY VERY GOOD)
+
 
