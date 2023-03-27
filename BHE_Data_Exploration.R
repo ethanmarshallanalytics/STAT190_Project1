@@ -338,4 +338,17 @@ ggplot(data=subset(u_phase, Generator_RPM<1400 & Generator_RPM>=100), aes(x=Gene
 # Do a decent scatterplot matrix, please: https://plotly.com/ggplot2/splom/
 
 ## HEATMAP RESOURCE
-# https://r-graph-gallery.com/79-levelplot-with-ggplot2.html
+# https://tidyverse.github.io/ggplot2-docs/reference/geom_bin2d.html
+
+
+## NEXT PROGRESS REPORT
+# Look at if a fault occurred within the next week (new column)
+  # if is_fault = 1 within 7 days from specific starting point
+  # numeric variable for days until next fault code occurs
+
+# Plots grouped on **fault type**
+  # UPDATE aggregate code to show fault type (not fault description)
+  # other code grouped on day, time, fault type
+  # facet on Is_Fault with vertical line for where changes in the data occur
+
+# Look at missing values in clean_data to impute new values
