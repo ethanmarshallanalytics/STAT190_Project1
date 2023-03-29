@@ -11,6 +11,7 @@ library(dplyr)
 
 
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
+## Turbine 7 Data Cleaning ---------
 data_7 <- subset(clean_data, Turbine == "Turbine 7")
 data_7 <- subset(data_7, select = -c(Datetime, Date, Status, Fault_Description, Round_Time, Wind_Speed_Group))
 
@@ -25,14 +26,33 @@ data_7$Fault_Code <- as.character(data_7$Fault_Code)
 # Removes columns with missing data
 data_7 <- na.omit(data_7)
 
-RNGkind(sample.kind = "default")
-set.seed(2291352)
-train.idx = sample(x=1:nrow(data_7), size = .8*nrow(data_7))
-train.data = data_7[train.idx, ]
-train.data$Is_Fault <- factor(train.data$Is_Fault)
-test.data = data_7[-train.idx, ]
+## 2000 from each Turbine Cleaning ------
+all_turbine <- clean_data %>%
+  group_by(Turbine) %>%
+  slice(1:2000)
+
+all_turbine <- subset(all_turbine, select = -c(Datetime, Date, Status, Fault_Description, Round_Time, Wind_Speed_Group))
+
+#data_7 <- data_7 %>%
+#  mutate_if(sapply(data_7, is.character), as.factor)
+
+# Changing Is_Fault from numerical to factor to run categorical instead of regression
+all_turbine$Is_Fault <- factor(all_turbine$Is_Fault)
+
+all_turbine$Fault_Code <- as.character(all_turbine$Fault_Code)
+
+# Removes columns with missing data
+all_turbine <- na.omit(all_turbine)
+
 
 ## BASELIEN FOREST -----
+RNGkind(sample.kind = "default")
+set.seed(2291352)
+train.idx = sample(x=1:nrow(all_turbine), size = .8*nrow(all_turbine))
+train.data = all_turbine[train.idx, ]
+train.data$Is_Fault <- factor(train.data$Is_Fault)
+test.data = all_turbine[-train.idx, ]
+
 base_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
                            Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                         data = train.data,
@@ -76,7 +96,7 @@ for(idx in 1:length(mtry)){
                             ntree = 1000,
                             mtry = mtry[idx])
   keeps[idx, "m"] = mtry[idx]
-  keeps[idx, "OOB_error_rate"] = mean(predict(tempforest) != train.data$Result)
+  keeps[idx, "OOB_error_rate"] = mean(predict(tempforest) != train.data$Is_Fault)
   
   
 }
@@ -92,7 +112,7 @@ final_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Gene
                               Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                             data = train.data,
                             ntree = 1000, # of classification trees in forest
-                            mtry = 4,  # SQRT of 10
+                            mtry = 8,  # SQRT of 10
                             importance = TRUE)
 final_forest
 
@@ -108,6 +128,8 @@ pi_star
 
 test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
 View(test.data)
+
+table(train_data$Is_Fault)
 
 # AUC = 0.892
 # pi* = 0.9015 ... we will only predict a fault occurring when the P(fault) > .9015
