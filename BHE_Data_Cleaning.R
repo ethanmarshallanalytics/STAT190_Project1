@@ -230,7 +230,6 @@ clean_data$Is_Fault <- ifelse(clean_data$Fault_Description %in%
                                     ,"No Valid Wind Data"
                                     ,"Lmu Sensor Error"
                                     ,"Yaw Converter Error"
-                                    ,"Too Many Slip Ring Errors"
                                     ,"Too Many Yaw Conv. Errors"
                                     ,"Rpm Sensor Error"
                                     ,"No Valid Wind Data"

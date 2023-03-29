@@ -14,6 +14,7 @@ library(scales)
 library(fuzzyjoin)
 # install.packages("hrbrthemes")
 library(hrbrthemes)
+library(RColorBrewer)
 
 ## DATA PREP -------
 # Read in Plotting Data
@@ -77,9 +78,12 @@ cor(cbind(Vars), use="pairwise.complete.obs")
 
 ## Scatter plot matrix
 p <- ggpairs(Vars, 
-             columns = 1:6,
-             aes(color=Is_Fault, alpha=0.2))
+             columns = 1:5,
+             aes(color=Is_Fault, alpha=0.2)) +
+  scale_colour_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2")
 ggplotly(p)
+
 
 
 ## HIGHEST CORRELATIONS FOR TURBINE 7
