@@ -356,3 +356,4 @@ ggplot(data=subset(u_phase, Generator_RPM<1400 & Generator_RPM>=100), aes(x=Gene
   # facet on Is_Fault with vertical line for where changes in the data occur
 
 # Look at missing values in clean_data to impute new values
+

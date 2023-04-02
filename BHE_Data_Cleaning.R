@@ -212,83 +212,215 @@ clean_data$Wind_Speed_Group <- factor(clean_data$Wind_Speed_Group,
 clean_data <- subset(clean_data, select = -c(Is_Fault))
 
 # change Is_Fault column to only include the correct faults
-# Faults listed are NOT important ... Is_Fault = 0
+# Faults listed ARE important ... Is_Fault = 1
 clean_data$Is_Fault <- ifelse(clean_data$Fault_Description %in% 
-                                  c("Ice Detection: Low Torque"
-                                    ,"No Fault"
-                                    ,"Remote Stop - Oem"
-                                    ,"Remote Stop - Owner"
-                                    ,"Stop For Powerdown"
-                                    ,"Stopped Due To Power Up Delay"
-                                    ,"Stopped For Sw Update"
-                                    ,"Stopped, Untwisting Cables"
-                                    ,"Manual Stop"
-                                    ,"Manual Idle Stop"
-                                    ,"Manual Idle Stop - Yawing"
-                                    ,"Mcb Cleaning Ended"
-                                    ,"Mcb Cleaning In Progresss"
-                                    ,"No Valid Wind Data"
-                                    ,"Lmu Sensor Error"
-                                    ,"Yaw Converter Error"
-                                    ,"Too Many Yaw Conv. Errors"
-                                    ,"Rpm Sensor Error"
-                                    ,"No Valid Wind Data"
-                                    ,"Inline (Bef) Pressure Sensor Error"
-                                    ,"Inline (Aft) Pressure Sensor Error"
-                                    ,"Hub: Blade A Valve Error"
-                                    ,"Hub: Blade B Valve Error"
-                                    ,"Hub: Blade C Valve Error"
-                                    ,"Hyd Oil Level Error"
-                                    ,"Grid Filter Res Temp Error"
-                                    ,"Grd. Inv. Communication Error"
-                                    ,"Ft1 Sonic Wind Sensor Error"
-                                    ,"Ambient Temp Sensor Error"
-                                    ,"Backup Battery Error"
-                                    ,"Brake (Gen) Temperature Error"
-                                    ,"Can 3 Buffer Overrorun Error"
-                                    ,"Can:Hub Communication Error"
-                                    ,"Can:Gs-1 Communication Error"
-                                    ,"Can:Gm  Communication Error"
-                                    ,"Can:Hub Module Init. Error"
-                                    ,"Can:Io-1 Communication Error"
-                                    ,"Can:Io-2 Communication Error"
-                                    ,"Can:Io-3 Communication Error"
-                                    ,"Can:Io-3 Module Init. Error"
-                                    ,"Can:Io-4 Communication Error"
-                                    ,"Can:Io-4 Module Init. Error"
-                                    ,"Can:Io-7 Communication Error"
-                                    ,"Offline Filter Stopped"
-                                    ,"Pitch A Tracking During Stop"
-                                    ,"Pitch B Tracking During Stop"
-                                    ,"Pitch C Tracking During Stop"
-                                    ,"Pitch Pump Time Too Long,Stop|"
-                                    ,"Pitch Pawl A Feedb. Stop"
-                                    ,"Timeout  Dc-Circuit Charging"
-                                    ,"Low Torque, No Ice (Temp=Norm)"
-                                    ,"Local, Ad-Hoc / Repair Work"
-                                    ,"Local, Customer / Guest Visit"
-                                    ,"Local, Scheduled Service Work"), 0, 1)
+                                c("Backup Battery Error"
+                                  ,"Converter Trip, External"
+                                  ,"Converter Tripped, Auto Start"
+                                  ,"Converter Tripped, General"
+                                  ,"Gear Oil Pressure Too High/Low"
+                                  ,"Gear Oil Pump/Blower Superheated"
+                                  ,"Gear Oil Temperature High"
+                                  ,"Gear Oil Temperature Low"
+                                  ,"Gear Oil Temp Sensor Warning"
+                                  ,"Gearoil Level Too Low"
+                                  ,"Geninv: 139 U-Phase Sharing"
+                                  ,"Geninv: 213 Undiagnosed,Delta2"
+                                  ,"Grdinv: 1 Interlock"
+                                  ,"Grid Filter Current Overload"
+                                  ,"Grid Filter Res Temp Error"
+                                  ,"Gridvolt<Lower Limit1"               
+                                  ,"Gridvolt<Lower Limit2"              
+                                  ,"Gridvolt<Lower Limit3"
+                                  ,"Gridvolt<Lower Limit4"
+                                  ,"High Pressure Warning: Blade X"
+                                  ,"High Upper Voltage Exceeded"
+                                  ,"Hub Pressureswitch Error"
+                                  ,"Hub: Blade A Valve Error"
+                                  ,"Hub: Blade B Valve Error"
+                                  ,"Hub: Blade C Valve Error"
+                                  ,"HubCheck valve fail - Stopped"
+                                  ,"Grease Level Low, Gen Bearings"
+                                  ,"Grease Level Low, Hub"
+                                  ,"Hs-Gen Gearbearing Superheated"
+                                  ,"Hs-Gen Gearbearing Temp Warning"
+                                  ,"Hs-Rot Gearbearing Temp Warning"
+                                  ,"Ims-Gen Gearbearing Temp Too High"
+                                  ,"Inv. Cooling  Water Temp High"
+                                  ,"Inv. Cooling Water Temp Warning"
+                                  ,"Inv.(Tow) Cool Water Pres. Low"
+                                  ,"Inv.(Tow) Cool Water Pres. Warning"
+                                  ,"Inverter Temperature High"
+                                  ,"Lmu Alarm Overspeed"
+                                  ,"Low Lower Voltage Exceeded"
+                                  ,"Low Oil Pressure, Blade A"
+                                  ,"Low Oil Pressure, Blade B"
+                                  ,"Low Oil Pressure, Blade C"
+                                  ,"Low Oil Pressure, Pump Station"
+                                  ,"Low Pitch Oil Pressure, Start"
+                                  ,"Main Bearing Temp Too High"
+                                  ,"Main Bearing Temp Warning"
+                                  ,"Mainbreaker Cut Out"
+                                  ,"No Lubrication, Blade A"
+                                  ,"No Lubrication, Blade B"
+                                  ,"No Lubrication, Blade C"
+                                  ,"No Lubrication, Gen Bearings"
+                                  ,"No Lubrication, Yaw System"
+                                  ,"No Valid Wind Data"
+                                  ,"Offlinefilter Motor Superheatd"
+                                  ,"Overspeed Hcu"
+                                  ,"Smoke In The A18 Box"
+                                  ,"Smoke In The A21 Box"
+                                  ,"Smoke In The A3 Box"
+                                  ,"Smoke In The A4 Box"
+                                  ,"Smoke In The Converter Breaker"
+                                  ,"Smoke In The Inverter"
+                                  ,"Slip Ring Error"
+                                  ,"Srsg Activated"
+                                  ,"Temperature In A18 Too High"
+                                  ,"Too Many Slip Ring Errors"
+                                  ,"Tower Conv. Cooling Water Low"
+                                  ,"Ups Battery Low"
+                                  ,"UPS Battery Low, Warning"
+                                  ,"Ups Bypass Error"
+                                  ,"Ups-Failure"
+                                  ,"Windspeed Too High To Operate"), 1, 0)
 
 
 # write to a fresh CSV file
 write.csv(clean_data, "Project1Data/clean_BHE_data.csv", row.names=F)
 
-## REMOVE IMPUTED VALUES IN NEW DATA SET -----
+## REMOVE IMPUTED VALUES IN NEW DATA SET ... PG3 -----
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 
 # create copy of dataset
-plotting_data = clean_data
+plot_data = clean_data
+
+# Create function to find the mode of the data
+getmode <- function(data) {
+  unique_data <- unique(data)
+  unique_data[which.max(tabulate(match(data, unique_data)))]
+}
 
 # replace imputed values with null
-plotting_data = plotting_data %>%
-  replace_with_na(replace = list(Oil_Temp = median(plotting_data$Oil_Temp),
-                                 Generator_RPM = median(plotting_data$Generator_RPM),
-                                 Wind_Speed = median(plotting_data$Wind_Speed),
-                                 Gearbox_Temp = median(plotting_data$Gearbox_Temp),
-                                 Active_Power = median(plotting_data$Active_Power),
-                                 Ambient_Temp = median(plotting_data$Ambient_Temp),
-                                 delta_temp = median(plotting_data$delta_temp)))
+plot_data = plot_data %>%
+  replace_with_na(replace = list(Oil_Temp = getmode(plot_data$Oil_Temp),
+                                 Generator_RPM = getmode(plot_data$Generator_RPM),
+                                 Wind_Speed = getmode(plot_data$Wind_Speed),
+                                 Gearbox_Temp = getmode(plot_data$Gearbox_Temp),
+                                 Active_Power = getmode(plot_data$Active_Power),
+                                 Ambient_Temp = getmode(plot_data$Ambient_Temp),
+                                 delta_temp = getmode(plot_data$delta_temp),
+                                 Hydraulic_Pressure = getmode(plot_data$Hydraulic_Pressure)))
 
 # write new CSV to a file
-write.csv(plotting_data, "Project1Data/plotting_data.csv", row.names=F)
+write.csv(plot_data, "Project1Data/plotting_data.csv", row.names=F)
 
+
+### IS_FAULT UPDATES V2.0 AND REMOVE IMPUTED VALUES V2.0 ... PG4------
+# read in clean_data
+clean_data = read.csv("Project1Data/clean_BHE_data.csv")
+
+# remove Is_Fault column to start fresh
+clean_data <- subset(clean_data, select = -c(Is_Fault))
+
+# change Is_Fault column to only include the correct faults
+# Faults listed ARE important ... Is_Fault = 1
+clean_data$Is_Fault <- ifelse(clean_data$Fault_Description %in% 
+                                c("Backup Battery Error"
+                                  ,"Converter Trip, External"
+                                  ,"Converter Tripped, Auto Start"
+                                  ,"Converter Tripped, General"
+                                  ,"Gear Oil Pressure Too High/Low"
+                                  ,"Gear Oil Pump/Blower Superheated"
+                                  ,"Gear Oil Temperature High"
+                                  ,"Gear Oil Temperature Low"
+                                  ,"Gear Oil Temp Sensor Warning"
+                                  ,"Gearoil Level Too Low"
+                                  ,"Geninv: 139 U-Phase Sharing"
+                                  ,"Geninv: 213 Undiagnosed,Delta2"
+                                  ,"Grdinv: 1 Interlock"
+                                  ,"Grid Filter Current Overload"
+                                  ,"Grid Filter Res Temp Error"
+                                  ,"Gridvolt<Lower Limit1"               
+                                  ,"Gridvolt<Lower Limit2"              
+                                  ,"Gridvolt<Lower Limit3"
+                                  ,"Gridvolt<Lower Limit4"
+                                  ,"High Pressure Warning: Blade X"
+                                  ,"High Upper Voltage Exceeded"
+                                  ,"Hub Pressureswitch Error"
+                                  ,"Hub: Blade A Valve Error"
+                                  ,"Hub: Blade B Valve Error"
+                                  ,"Hub: Blade C Valve Error"
+                                  ,"HubCheck valve fail - Stopped"
+                                  ,"Grease Level Low, Gen Bearings"
+                                  ,"Grease Level Low, Hub"
+                                  ,"Hs-Gen Gearbearing Superheated"
+                                  ,"Hs-Gen Gearbearing Temp Warning"
+                                  ,"Hs-Rot Gearbearing Temp Warning"
+                                  ,"Ims-Gen Gearbearing Temp Too High"
+                                  ,"Inv. Cooling  Water Temp High"
+                                  ,"Inv. Cooling Water Temp Warning"
+                                  ,"Inv.(Tow) Cool Water Pres. Low"
+                                  ,"Inv.(Tow) Cool Water Pres. Warning"
+                                  ,"Inverter Temperature High"
+                                  ,"Lmu Alarm Overspeed"
+                                  ,"Low Lower Voltage Exceeded"
+                                  ,"Low Oil Pressure, Blade A"
+                                  ,"Low Oil Pressure, Blade B"
+                                  ,"Low Oil Pressure, Blade C"
+                                  ,"Low Oil Pressure, Pump Station"
+                                  ,"Low Pitch Oil Pressure, Start"
+                                  ,"Main Bearing Temp Too High"
+                                  ,"Main Bearing Temp Warning"
+                                  ,"Mainbreaker Cut Out"
+                                  ,"No Lubrication, Blade A"
+                                  ,"No Lubrication, Blade B"
+                                  ,"No Lubrication, Blade C"
+                                  ,"No Lubrication, Gen Bearings"
+                                  ,"No Lubrication, Yaw System"
+                                  ,"No Valid Wind Data"
+                                  ,"Offlinefilter Motor Superheatd"
+                                  ,"Overspeed Hcu"
+                                  ,"Smoke In The A18 Box"
+                                  ,"Smoke In The A21 Box"
+                                  ,"Smoke In The A3 Box"
+                                  ,"Smoke In The A4 Box"
+                                  ,"Smoke In The Converter Breaker"
+                                  ,"Smoke In The Inverter"
+                                  ,"Slip Ring Error"
+                                  ,"Srsg Activated"
+                                  ,"Temperature In A18 Too High"
+                                  ,"Too Many Slip Ring Errors"
+                                  ,"Tower Conv. Cooling Water Low"
+                                  ,"Ups Battery Low"
+                                  ,"UPS Battery Low, Warning"
+                                  ,"Ups Bypass Error"
+                                  ,"Ups-Failure"
+                                  ,"Windspeed Too High To Operate"), 1, 0)
+
+# write to a fresh CSV file
+write.csv(clean_data, "Project1Data/clean_BHE_data.csv", row.names=F)
+
+# create copy of dataset
+plot_data = clean_data
+
+# Create function to find the mode of the data
+getmode <- function(data) {
+  unique_data <- unique(data)
+  unique_data[which.max(tabulate(match(data, unique_data)))]
+}
+
+# replace imputed values with null
+plot_data = plot_data %>%
+  replace_with_na(replace = list(Oil_Temp = getmode(plot_data$Oil_Temp),
+                                 Generator_RPM = getmode(plot_data$Generator_RPM),
+                                 Wind_Speed = getmode(plot_data$Wind_Speed),
+                                 Gearbox_Temp = getmode(plot_data$Gearbox_Temp),
+                                 Active_Power = getmode(plot_data$Active_Power),
+                                 Ambient_Temp = getmode(plot_data$Ambient_Temp),
+                                 delta_temp = getmode(plot_data$delta_temp),
+                                 Hydraulic_Pressure = getmode(plot_data$Hydraulic_Pressure)))
+
+# write new CSV to a file
+write.csv(plot_data, "Project1Data/plotting_data.csv", row.names=F)
