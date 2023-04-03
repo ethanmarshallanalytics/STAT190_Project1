@@ -1,6 +1,6 @@
 # Windspeed & Genearator RPM
 
-windspeed <- list.files("Windspeed/Windspeed")
+windspeed <- list.files("Windspeed/Wind Turbine Data Batch 2 - Windspeed/Windspeed")
 windspeed
 
 combined <- data.frame()
@@ -9,14 +9,14 @@ combined <- data.frame()
 for (file in windspeed[-1]) {
   
   
-  data <- read.csv(paste0("Windspeed/Windspeed/", file), header = FALSE)
-  
+  data <- read.csv(paste0("Windspeed/Wind Turbine Data Batch 2 - Windspeed/Windspeed/", file), header = FALSE)
+  print(nrow(data))
   # Append the data to the combined_data data frame
   combined <- rbind(combined, data)
 }
 
 # Write the combined data to a file
-write.csv(combined, "Windspeed/windspeed.csv")
+write.csv(combined, "Windspeed/Wind Turbine Data Batch 2 - Windspeed/Windspeed/windspeedp2.csv")
 
 #------------
 rpm <- list.files("Generator RPM/Generator RPM")
