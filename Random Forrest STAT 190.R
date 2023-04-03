@@ -44,33 +44,13 @@ all_turbine$Fault_Code <- as.character(all_turbine$Fault_Code)
 # Removes columns with missing data
 all_turbine <- na.omit(all_turbine)
 
-
-## BASELIEN FOREST -----
 RNGkind(sample.kind = "default")
 set.seed(2291352)
 train.idx = sample(x=1:nrow(all_turbine), size = .8*nrow(all_turbine))
 train.data = all_turbine[train.idx, ]
 train.data$Is_Fault <- factor(train.data$Is_Fault)
 test.data = all_turbine[-train.idx, ]
-
-base_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
-                           Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
-                        data = train.data,
-                        ntree = 1000, # of classification trees in forest
-                        mtry = 4,  # SQRT of 10
-                        importance = TRUE) 
-
-# importance = TRUE will help us identify important predictors (later)
-# note: it does make the algorithm slower
-base_forest
-
-### TUNING THE FOREST ----
-# Answering the question: Can a too-high B overfit?
-# R actually calculates the average OOB error for us
-# it does it for 10 trees, 11 trees, 12 trees... all the way up to however many trees we fit
-
-plot(base_forest)
-
+## TUNING THE FOREST ----
 # Moral of the story: fit as many trees as you have time for
 # You cannot fit based on too many trees
 
@@ -112,7 +92,7 @@ final_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Gene
                               Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                             data = train.data,
                             ntree = 1000, # of classification trees in forest
-                            mtry = 8,  # SQRT of 10
+                            mtry = 7,  # SQRT of 10
                             importance = TRUE)
 final_forest
 
