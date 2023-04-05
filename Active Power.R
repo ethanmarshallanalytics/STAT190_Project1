@@ -21,7 +21,7 @@ for (file in ap_files[-1]) {
 }
 
 # Write the combined data to a file
-write.csv(combined_data_ap, "Project1Data/active_power_p2_1.csv")
+write.csv(combined_data_ap, "Project1Data/active_power_p2.csv")
 
 ## folder 2
 # ap_files2 <- list.files("Project1Data/Wind Turbine Data Batch 2 - Active Power 2/Active Power")
