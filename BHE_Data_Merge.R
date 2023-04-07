@@ -42,7 +42,9 @@ plot_data <- read.csv("Project1Data/plotting_data.csv")
 # convert datetimes and aggregate fault code times
 fc$V2 <- ymd_hms(fc$V2) # change from chr to timestamp
 fc$V3 <- ymd(fc$V3) # change from chr to date
-fc$Round_Time <- round_date(fc$V2, "10 minute")
+fc$Round_Time <- round_date(fc$V2, "10 minute") # round to every 10 minutes
+fc <- subset(fc, select = -c(X)) # remove unnecessary columns
+fc <- fc %>% distinct(V1, Round_Time, .keep_all = TRUE) # select only distinct fault codes
 
 # function to change data types, group on 10 minute intervals, and find average value
 grouping <- function(data){
@@ -64,6 +66,7 @@ at = grouping(at)
 
 # combine gearbox data together
 gearbox <- rbind(gearbox1, gearbox2, gearbox3)
+gearbox <- gearbox %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(Avg_Value, na.rm=TRUE))
 
 # join fault code data to other data sets
 df1 <- fc %>% 
@@ -74,9 +77,6 @@ df1 <- fc %>%
   full_join(ap, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
   full_join(hp, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
   full_join(at, by=c("Round_Time"="Round_Time", "V1"="V1"))
-
-# remove unnecessary columns
-df1 <- subset(df1, select = -c(X))
 
 # rename remaining columns to something meaningful
 df1 <- df1 %>%
@@ -95,22 +95,17 @@ df1 <- df1 %>%
          "Hydraulic_Pressure" = "Avg_Value.y.y.y",
          "Ambient_Temp" = "Avg_Value")
 
-# select unique round_times
-df1 <- distinct(df1, Round_Time, .keep_all = T)
-
-
-## UPDATE Is_Fault -----
+## Determine Is_Fault -----
 # corrections to Is_Fault, Fault_Type, and Fault_Description to deal with missing values
 # assume no fault code occurred
-clean_data$Fault_Type[is.na(clean_data$Fault_Type)] = "No Fault"
-clean_data$Fault_Description[is.na(clean_data$Fault_Description)] = "No Fault"
+df1$Fault_Type[is.na(df1$Fault_Type)] = "No Fault"
+df1$Fault_Description[is.na(df1$Fault_Description)] = "No Fault"
 
 # rename blank strings to "no fault"
-clean_data$Fault_Type <- ifelse(clean_data$Fault_Type == "", "No Fault", clean_data$Fault_Type)
-clean_data$Fault_Description <- ifelse(clean_data$Fault_Description == "", "No Fault", clean_data$Fault_Description)
+df1$Fault_Type <- ifelse(df1$Fault_Type == "", "No Fault", df1$Fault_Type)
+df1$Fault_Description <- ifelse(df1$Fault_Description == "", "No Fault", df1$Fault_Description)
 
-
-
+# Create Is_Fault column on new data
 df1$Is_Fault <- ifelse(df1$Fault_Description %in% 
                                 c("Backup Battery Error"
                                   ,"Converter Trip, External"
@@ -184,17 +179,22 @@ df1$Is_Fault <- ifelse(df1$Fault_Description %in%
                                   ,"Ups-Failure"
                                   ,"Windspeed Too High To Operate"), 1, 0)
 
-
-
-
 ## UPSERT DATA ----
-# change Round_Time to datetime format in plot_format
-plot_data$Round_Time <- ymd_hms(plot_data$Round_Time)
+# remove engineered columns from plot_data (Wind_Speed_Group, delta_temp)
+plot_data <- subset(plot_data, select = -c(Wind_Speed_Group, delta_temp)) 
 
-# use full_join function in dplyr package
-plot_data <- plot_data %>%
-  full_join(df1, by=c("Turbine"="Turbine", "Round_Time"="Round_Time"))
-  
+# change datatypes of each dataset to match
+plot_data$Datetime <- ymd_hms(plot_data$Datetime)
+plot_data$Date <- ymd(plot_data$Date)
+df1$Status <- as.character(df1$Status)
+plot_data$Round_Time <- ymd_hms(plot_data$Round_Time)
+df1$Is_Fault <- as.integer(df1$Is_Fault)
+
+# merge the datasets
+plot_data <- unique(rbind(plot_data, df1), by=c("Turbine", "Round_Time"), fromLast=TRUE)
+
+# write to a new data file
+write.csv(plot_data, "Project1Data/plotting_data.csv", row.names=F)
   
   
   
