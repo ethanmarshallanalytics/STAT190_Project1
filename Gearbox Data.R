@@ -7,7 +7,7 @@ library(readr)
 
 
 ## -----------------------------Gearbox Bearing Part 1
-sensor_files_1 <- list.files("Project1Data/Wind Turbine Data Batch 2 - Gearbox HS Bearing/Gearbox HS Bearing")
+sensor_files_1 <- list.files("Bear3/Wind Turbine Data Batch 2 - Gearbox IMS Bearing 2/Gearbox IMS Bearing 2")
 sensor_files_1
 
 combined_data_1 <- data.frame()
@@ -16,14 +16,14 @@ combined_data_1 <- data.frame()
 for (file in sensor_files_1[-1]) {
   
   
-  data <- read.csv(paste0("Project1Data/Wind Turbine Data Batch 2 - Gearbox HS Bearing/Gearbox HS Bearing/", file), header = FALSE)
+  data <- read.csv(paste0("Bear3/Wind Turbine Data Batch 2 - Gearbox IMS Bearing 2/Gearbox IMS Bearing 2/", file), header = FALSE)
   print(nrow(data))
   # Append the data to the combined_data data frame
   combined_data_1 <- rbind(combined_data_1, data)
 }
 
 # Write the combined data to a file
-write.csv(combined_data_1, "Project1Data/gearbox_1_p2.csv")
+write.csv(combined_data_1, "Bear3/Wind Turbine Data Batch 2 - Gearbox IMS Bearing 2/Gearbox IMS Bearing 2/gearbox_3_p2.csv")
 
 
 ## ------------------------------------------Gearbox Bearing Part 2
