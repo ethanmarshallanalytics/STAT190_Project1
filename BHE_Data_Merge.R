@@ -195,12 +195,96 @@ plot_data <- unique(rbind(plot_data, df1), by=c("Turbine", "Round_Time"), fromLa
 
 # write to a new data file
 write.csv(plot_data, "Project1Data/plotting_data.csv", row.names=F)
-  
-  
-  
 
+## CORRECTION**: SPLIT NEW DATA INTO SEPERATE DATA SET ----
+# Read in clean data
+clean_data = read.csv("Project1Data/clean_BHE_data.csv")
 
+# create copy of dataset
+plot_data_1 = clean_data
 
+# Create function to find the mode of the data
+getmode <- function(data) {
+  unique_data <- unique(data)
+  unique_data[which.max(tabulate(match(data, unique_data)))]
+}
+
+# replace imputed values with null
+plot_data_1 = plot_data_1 %>%
+  replace_with_na(replace = list(Oil_Temp = getmode(plot_data_1$Oil_Temp),
+                                 Generator_RPM = getmode(plot_data_1$Generator_RPM),
+                                 Wind_Speed = getmode(plot_data_1$Wind_Speed),
+                                 Gearbox_Temp = getmode(plot_data_1$Gearbox_Temp),
+                                 Active_Power = getmode(plot_data_1$Active_Power),
+                                 Ambient_Temp = getmode(plot_data_1$Ambient_Temp),
+                                 delta_temp = getmode(plot_data_1$delta_temp),
+                                 Hydraulic_Pressure = getmode(plot_data_1$Hydraulic_Pressure)))
+
+# write new CSV to a file
+write.csv(plot_data_1, "Project1Data/plotting_data_1.csv", row.names=F)
+
+# Read in merged plotting data
+plot_data = read.csv("Project1Data/plotting_data.csv")
+
+# subset to only turbines in new data
+plot_data <- subset(plot_data, plot_data$Turbine %in% c("Turbine 21",
+                                                        "Turbine 22",
+                                                        "Turbine 23",
+                                                        "Turbine 24",
+                                                        "Turbine 25",
+                                                        "Turbine 26",
+                                                        "Turbine 27",
+                                                        "Turbine 28",
+                                                        "Turbine 29",
+                                                        "Turbine 30",
+                                                        "Turbine 31",
+                                                        "Turbine 32",
+                                                        "Turbine 33",
+                                                        "Turbine 34",
+                                                        "Turbine 35",
+                                                        "Turbine 36",
+                                                        "Turbine 37"))
+
+# remove Gearbox_Temp column
+plot_data <- subset(plot_data, select = -c(Gearbox_Temp))
+
+# read in Gearbox HS data
+gearboxHS <- read.csv("Project1Data/gearbox_1_p2.csv")
+
+# read in Gearbox IMS data
+gearboxIMS1 <- read.csv("Project1Data/gearbox_2_p2.csv")
+gearboxIMS2 <- read.csv("Project1Data/gearbox_3_p2.csv")
+
+# function to change data types, group on 10 minute intervals, and find average value
+grouping <- function(data){
+  data$V2 <- ymd_hms(data$V2)
+  data$Round_Time <- round_date(data$V2, "10 minute")
+  data <- data %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(V4, na.rm=TRUE))
+}
+
+# call function on gearbox data
+gearboxHS = grouping(gearboxHS)
+gearboxIMS1 = grouping(gearboxIMS1)
+gearboxIMS2 = grouping(gearboxIMS2)
+
+# combine gearbox data together
+gearboxIMS <- rbind(gearboxIMS1, gearboxIMS2)
+gearboxIMS <- gearboxIMS %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(Avg_Value, na.rm=TRUE))
+
+# join fault code data to other data sets
+plot_data$Round_Time <- ymd_hms(plot_data$Round_Time) # change from chr to timestamp
+
+plot_data_a <- plot_data %>%
+  full_join(gearboxHS, by=c("Round_Time"="Round_Time", "Turbine"="V1")) %>%
+  full_join(gearboxIMS, by=c("Round_Time"="Round_Time", "Turbine"="V1"))
+
+# rename columns to something meaningful
+plot_data_a <- plot_data_a %>%
+  rename("Gearbox_Temp_HS" = "Avg_Value.x",
+         "Gearbox_Temp_IMS" = "Avg_Value.y")
+
+# write new CSV to a file
+write.csv(plot_data_a, "Project1Data/plotting_data_2.csv", row.names=F)
 
 
 
