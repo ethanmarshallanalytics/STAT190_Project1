@@ -36,6 +36,8 @@ grouping <- function(data){
   data$V2 <- ymd_hms(data$V2)
   data$Round_Time <- round_date(data$V2, "10 minute")
   data <- data %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(V4, na.rm=TRUE))
+  data <- data %>% mutate(Generator_RPM_Lag = lag(Generator_RPM, n = 1, default = NA))
+
 }
 
 # call functions on each dataset
@@ -424,3 +426,22 @@ plot_data = plot_data %>%
 
 # write new CSV to a file
 write.csv(plot_data, "Project1Data/plotting_data.csv", row.names=F)
+
+## Group By 6hr lag
+clean_data$Round_Time <- ymd_hms(clean_data$Round_Time)
+clean_data$Round_Time_lagged <- clean_data$Round_Time - hours(6)
+
+clean_data %>%
+  arrange(Turbine, Round_Time) %>%
+  group_by(Turbine) %>%
+  mutate(Round_Time_Lag = lag(Round_Time))
+
+# --------------------------
+clean_data <- clean_data %>% 
+  group_by(Turbine, Round_Time) %>% 
+  arrange(Round_Time)
+
+clean_data <- clean_data %>% 
+  mutate(Generator_RPM_Lag = lag(Generator_RPM, n = 1, default = NA))
+
+table(clean_data$Generator_RPM, clean_data$Generator_RPM_Lag)
