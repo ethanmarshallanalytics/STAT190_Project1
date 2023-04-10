@@ -4,21 +4,21 @@ library(dplyr)
 library(tidyverse)
 library(forcats)
 library(lubridate)
-# install.packages("naniar")
+#install.packages("naniar")
 library(naniar)
 
 ## Read in SENSOR DATA and OLD DATA------
 # fault data
-fc <- read.csv("Project1Data/fault_codes_p2.csv")
+fc <- read.csv("Project1Data/faults_p2.csv")
 
 # oil_temp
-oil_temp <- read.csv("Project1Data/gearbox_oil_temp_p2.csv")
+oil_temp <- read.csv("Project1Data/oil_temp_p2.csv")
 
 # generator_rpm
-rpm <- read.csv("Project1Data/generator_rpm_p2.csv")
+rpm <- read.csv("Project1Data/generatorRPM_p2.csv")
 
 # wind_speed
-wind <- read.csv("Project1Data/windspeed_p2.csv")
+wind <- read.csv("Project1Data/windspeed-p2.csv")
 
 # gearbox_temp
 gearbox1 <- read.csv("Project1Data/gearbox_1_p2.csv")
