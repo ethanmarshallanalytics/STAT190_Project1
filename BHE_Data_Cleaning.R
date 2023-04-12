@@ -434,7 +434,14 @@ clean_data$Round_Time <- ymd_hms(clean_data$Round_Time) # change from chr to tim
 clean_data_1 <- clean_data %>%
   group_by(Turbine) %>%
   arrange(Round_Time) %>%
-  mutate(prev_oil_temp = lag(Oil_Temp, n = 36))
+  mutate(prev_oil_temp = lag(Oil_Temp, n = 36)) %>%
+  mutate(prev_generator_RPM = lag(Generator_RPM, n = 36)) %>%
+  mutate(prev_wind_speed = lag(Wind_Speed, n = 36)) %>%
+  mutate(prev_gearbox_temp = lag(Gearbox_Temp, n = 36)) %>%
+  mutate(prev_active_power = lag(Active_Power, n = 36)) %>%
+  mutate(prev_ambient_temp = lag(Ambient_Temp, n = 36)) %>%
+  mutate(prev_hydraulic_pressure = lag(Hydraulic_Pressure, n = 36))
+  
 
 
 
