@@ -427,21 +427,14 @@ plot_data = plot_data %>%
 # write new CSV to a file
 write.csv(plot_data, "Project1Data/plotting_data.csv", row.names=F)
 
-## Group By 6hr lag
-clean_data$Round_Time <- ymd_hms(clean_data$Round_Time)
-clean_data$Round_Time_lagged <- clean_data$Round_Time - hours(6)
+## 6hr Lag Code ---------------
+clean_data$Round_Time <- ymd_hms(clean_data$Round_Time) # change from chr to timestamp
 
-clean_data %>%
-  arrange(Turbine, Round_Time) %>%
+## This is working but is eliminating data for some reason. (Data is also bad)
+clean_data_1 <- clean_data %>%
   group_by(Turbine) %>%
-  mutate(Round_Time_Lag = lag(Round_Time))
+  arrange(Round_Time) %>%
+  mutate(prev_oil_temp = lag(Oil_Temp, n = 36))
 
-# --------------------------
-clean_data <- clean_data %>% 
-  group_by(Turbine, Round_Time) %>% 
-  arrange(Round_Time)
 
-clean_data <- clean_data %>% 
-  mutate(Generator_RPM_Lag = lag(Generator_RPM, n = 1, default = NA))
 
-table(clean_data$Generator_RPM, clean_data$Generator_RPM_Lag)
