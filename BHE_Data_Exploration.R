@@ -80,8 +80,8 @@ cor(cbind(Vars), use="pairwise.complete.obs")
 p <- ggpairs(Vars, 
              columns = 1:5,
              aes(color=Is_Fault, alpha=0.2)) +
-  scale_colour_brewer(palette = "Dark2") +
-  scale_fill_brewer(palette = "Dark2")
+  scale_color_manual(values = c("darkgrey", "darkred")) +
+  scale_fill_manual(values = c("darkgrey", "darkred"))
 ggplotly(p)
 
 
