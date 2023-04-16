@@ -28,7 +28,6 @@ master_data$Active_Power = na_interpolation(master_data$Active_Power)
 master_data$Ambient_Temp = na_interpolation(master_data$Ambient_Temp)
 master_data$Hydraulic_Pressure = na_interpolation(master_data$Hydraulic_Pressure)
 
-write.csv(master_data, "Project1Data/master_data.csv", row.names=F)
 
 ## Lag Stuff ------------
 master_data <- master_data %>%
@@ -47,4 +46,7 @@ master_data <- master_data[c("Turbine", "Datetime", "Date", "Fault_Code", "Statu
                              "Fault_Description", "Fault_Type", "Round_Time", "Oil_Temp", "prev_oil_temp",
                              "Generator_RPM", "prev_generator_RPM", "Wind_Speed", "prev_wind_speed", "Gearbox_Temp",
                              "prev_gearbox_temp", "Active_Power", "prev_active_power", "Ambient_Temp", "prev_ambient_temp",
-                             "Hydraulic_Pressure", "prev_hydraulic_pressure")]
+                             "Hydraulic_Pressure", "prev_hydraulic_pressure", "Is_Fault")]
+
+write.csv(master_data, "Project1Data/master_data.csv", row.names=F)
+
