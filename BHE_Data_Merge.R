@@ -287,4 +287,3 @@ plot_data_a <- plot_data_a %>%
 write.csv(plot_data_a, "Project1Data/plotting_data_2.csv", row.names=F)
 
 
-

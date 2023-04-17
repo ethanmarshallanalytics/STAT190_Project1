@@ -19,6 +19,7 @@ library(RColorBrewer)
 ## DATA PREP -------
 # Read in Plotting Data
 plot_data = read.csv("Project1Data/plotting_data.csv")
+a <- read.csv("Project1Data/plotting_data_1.csv")
 
 # Read in Clean Data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
@@ -198,21 +199,16 @@ ggplot(data=subset(data_7_faults, Active_Power<2000 & Generator_RPM<1400 & Gener
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(10,20)) +
   labs(x = "Generator RPM", y = "Active Power (kW)") +
   scale_x_continuous(breaks = c(200,400,600,800,1000,1200,1400)) +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Active Power vs. Generator RPM -- FAULTS") + 
   theme_bw()
-
-master_data = read.csv("Project1Data/master_data.csv")
-
 
 # no fault data
 ggplot(data=subset(data_7_no_faults, Active_Power<2000 & Generator_RPM<1400 & Generator_RPM >=100), aes(x=Generator_RPM, y=Active_Power)) +
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(10,20)) +
   labs(x = "Generator RPM", y = "Active Power (kW)") +
   scale_x_continuous(breaks = c(200,400,600,800,1000,1200,1400)) +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Active Power vs. Generator RPM -- NO FAULTS") +
   theme_bw()
 
@@ -222,8 +218,7 @@ ggplot(data=subset(data_7_faults, Generator_RPM<1400 & Generator_RPM>=100), aes(
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(10,1)) +
   labs(x = "Generator RPM", y = "Gearbox Temperature (ºC)") +
   scale_x_continuous(breaks = c(200,400,600,800,1000,1200,1400)) +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Gearbox Temperature vs. Generator RPM -- FAULTS") +
   theme_bw()
 
@@ -232,8 +227,7 @@ ggplot(data=subset(data_7_no_faults, Generator_RPM<1400 & Generator_RPM>=100), a
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(10,1)) +
   labs(x = "Generator RPM", y = "Gearbox Temperature (ºC)") +
   scale_x_continuous(breaks = c(200,400,600,800,1000,1200,1400)) +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Gearbox Temperature vs. Generator RPM -- NO FAULTS") +
   theme_bw()
 
@@ -242,8 +236,7 @@ ggplot(data=subset(data_7_no_faults, Generator_RPM<1400 & Generator_RPM>=100), a
 ggplot(data=subset(data_7_faults, Hydraulic_Pressure<=225), aes(x=Gearbox_Temp, y=Hydraulic_Pressure)) +
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(1,4)) +
   labs(x = "Gearbox Temperature (ºC)", y = "Hydraulic Pressure (bar)") +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Hydraulic Pressure vs. Gearbox Temperature -- FAULTS") +
   theme_bw()
 
@@ -251,8 +244,7 @@ ggplot(data=subset(data_7_faults, Hydraulic_Pressure<=225), aes(x=Gearbox_Temp, 
 ggplot(data=subset(data_7_no_faults, Hydraulic_Pressure<=225), aes(x=Gearbox_Temp, y=Hydraulic_Pressure)) +
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(1,4)) +
   labs(x = "Gearbox Temperature (ºC)", y = "Hydraulic Pressure (bar)") +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Hydraulic Pressure vs. Gearbox Temperature -- NO FAULTS") +
   theme_bw()
 
@@ -261,8 +253,7 @@ ggplot(data=subset(data_7_no_faults, Hydraulic_Pressure<=225), aes(x=Gearbox_Tem
 ggplot(data=subset(data_7_faults, Hydraulic_Pressure<224), aes(x=Generator_RPM, y=Hydraulic_Pressure)) +
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(20,4)) +
   labs(x = "Generator_RPM", y = "Hydraulic Pressure (bar)") +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Hydraulic Pressure vs. Generator RPM -- FAULTS") +
   theme_bw()
 
@@ -270,8 +261,7 @@ ggplot(data=subset(data_7_faults, Hydraulic_Pressure<224), aes(x=Generator_RPM, 
 ggplot(data=subset(data_7_no_faults, Hydraulic_Pressure<224), aes(x=Generator_RPM, y=Hydraulic_Pressure)) +
   stat_bin2d(aes(fill = after_stat(count)), binwidth = c(20,4)) +
   labs(x = "Generator_RPM", y = "Hydraulic Pressure (bar)") +
-  scale_fill_continuous(name = "Frequency") +
-  scale_fill_gradient(low="darkgrey", high="darkred") +
+  scale_fill_gradient(low="darkgrey", high="darkred", name="Frequency") +
   ggtitle("Hydraulic Pressure vs. Generator RPM -- NO FAULTS") +
   theme_bw()
 
