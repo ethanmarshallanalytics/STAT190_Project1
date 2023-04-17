@@ -30,6 +30,8 @@ master_data$Hydraulic_Pressure = na_interpolation(master_data$Hydraulic_Pressure
 
 
 ## Lag Stuff ------------
+master_data <- read.csv("Project1Data/master_data.csv")
+
 master_data <- master_data %>%
   group_by(Turbine) %>%
   arrange(Round_Time) %>%
@@ -49,4 +51,5 @@ master_data <- master_data[c("Turbine", "Datetime", "Date", "Fault_Code", "Statu
                              "Hydraulic_Pressure", "prev_hydraulic_pressure", "Is_Fault")]
 
 write.csv(master_data, "Project1Data/master_data.csv", row.names=F)
+
 
