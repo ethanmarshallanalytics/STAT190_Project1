@@ -11,6 +11,7 @@ library(dplyr)
 
 
 master_data = read.csv("Project1Data/master_data.csv")
+
 ## Turbine 7 Data Cleaning ---------
 data_7 <- subset(clean_data, Turbine == "Turbine 7")
 data_7 <- subset(data_7, select = -c(Datetime, Date, Status, Fault_Description, Round_Time, Wind_Speed_Group))
@@ -46,7 +47,7 @@ all_turbine <- na.omit(all_turbine)
 
 RNGkind(sample.kind = "default")
 set.seed(2291352)
-train.idx = sample(x=1:nrow(all_turbine), size = .8*nrow(all_turbine))
+train.idx = sample(x=1:nrow(all_turbine), size = .7*nrow(all_turbine))
 train.data = all_turbine[train.idx, ]
 train.data$Is_Fault <- factor(train.data$Is_Fault)
 test.data = all_turbine[-train.idx, ]
@@ -57,7 +58,7 @@ test.data = all_turbine[-train.idx, ]
 # tune m actually is important and can affect model performance
 
 # create a sequence of m values we want to try
-mtry = c(1:10) # This can only be the number of x variables
+mtry = c(2,3,6) # This can only be the number of x variables
 
 #note: you can do each possible number if you have time if you are computationally limited,
 #   see the notes on page 28 for how to choose a more limited list.
@@ -72,9 +73,12 @@ master_data <- master_data %>%
 keeps = data.frame(m = rep(NA, length(mtry)),
                    OOB_error_rate = rep(NA, length(mtry)))
 
+#master_data <- head(master_data, 250000)
+
+
 RNGkind(sample.kind = "default")
 set.seed(2291352)
-train.idx = sample(x=1:nrow(master_data), size = .8*nrow(master_data))
+train.idx = sample(x=1:nrow(master_data), size = .7*nrow(master_data))
 train.data = master_data[train.idx, ]
 test.data = master_data[-train.idx, ]
 
@@ -84,7 +88,7 @@ for(idx in 1:length(mtry)){
   tempforest = randomForest(Is_Fault ~ Turbine + Fault_Type + prev_oil_temp + prev_gearbox_temp + prev_active_power +
                               prev_wind_speed + prev_generator_RPM + prev_active_power + prev_ambient_temp + prev_hydraulic_pressure,
                             data = train.data,
-                            ntree = 1000,
+                            ntree = 100,
                             mtry = mtry[idx])
   keeps[idx, "m"] = mtry[idx]
   keeps[idx, "OOB_error_rate"] = mean(predict(tempforest) != train.data$Is_Fault)
@@ -102,7 +106,7 @@ ggplot(data = keeps) +
 final_forest = randomForest(Is_Fault ~ Fault_Code + Fault_Type + Oil_Temp + Generator_RPM +
                               Wind_Speed + Gearbox_Temp + Active_Power + Ambient_Temp + Hydraulic_Pressure + delta_temp,
                             data = train.data,
-                            ntree = 1000, # of classification trees in forest
+                            ntree = 500, # of classification trees in forest
                             mtry = 7,  # SQRT of 10
                             importance = TRUE)
 final_forest
