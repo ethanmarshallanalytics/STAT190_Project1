@@ -143,3 +143,37 @@ ggplot(data=subset(u_phase, Generator_RPM<1400 & Generator_RPM>=100), aes(x=Gene
   ggtitle("Gearbox Temperature vs. Generator RPM U-Phase Faults") +
   scale_x_continuous(breaks=c(200,400,600,800,1000,1200,1400))+
   theme_bw()
+
+## SENSITIVITY PLOTS ------
+# load in data
+t10_sens = read.csv("Project1Data/T10_Sens_Forest.csv")
+
+summary(t10_sens)
+
+# scatter plot matrix
+Vars = data.frame(t10_sens$Oil_Temp,
+                  t10_sens$Generator_RPM,
+                  t10_sens$Wind_Speed,
+                  t10_sens$Gearbox_Temp,
+                  t10_sens$Active_Power,
+                  t10_sens$Ambient_Temp,
+                  t10_sens$Hydraulic_Pressure)
+
+Vars <- Vars %>%
+  rename("Oil_Temp" = "t10_sens.Oil_Temp", 
+         "Generator_RPM" = "t10_sens.Generator_RPM",
+         "Wind_Speed" = "t10_sens.Wind_Speed",
+         "Gearbox_Temp" = "t10_sens.Gearbox_Temp", 
+         "Active_Power" = "t10_sens.Active_Power", 
+         "Ambient_Temp" = "t10_sens.Ambient_Temp",
+         "Hydraulic_Pressure" = "t10_sens.Hydraulic_Pressure")
+         
+## Correlation Matrix
+cor(cbind(Vars), use="pairwise.complete.obs")
+
+## Scatter plot matrix
+p <- ggpairs(Vars, 
+             columns = 1:7) +
+  scale_color_manual(values = c("darkgrey", "darkred")) +
+  scale_fill_manual(values = c("darkgrey", "darkred"))
+ggplotly(p)
