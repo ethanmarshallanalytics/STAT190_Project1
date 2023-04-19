@@ -102,13 +102,9 @@ pi_star
 test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
 View(test.data)
 
-table(train_data$Is_Fault)
+test.data_sens = test.data %>% subset(Is_Fault == "1" & forest_pred == "0")
 
-# AUC = 0.892
-# pi* = 0.9015 ... we will only predict a fault occurring when the P(fault) > .9015
-# Specificity: .789
-# Sensitivity: .980 (VERY VERY GOOD)
-
+write.csv(test.data_sens, "Project1Data/T10_Sens_Forest.csv", row.names = FALSE)
 
 
 ## foreach package ------
