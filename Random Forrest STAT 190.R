@@ -100,7 +100,7 @@ pi_star = coords(rocCurve, "best", ret = "threshold")$threshold[1]
 pi_star
 
 test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
-View(test.data)
+# View(test.data)
 
 test.data_sens = test.data %>% subset(Is_Fault == "1" & forest_pred == "0")
 
@@ -132,10 +132,62 @@ outputs = master_data[,23]
 ranger_model <- ranger(formula = as.formula(paste(outputs, "~", paste(inputs, collapse = "+"))), 
                    data = train.data)
 
-## Turbine 10 
+## Turbine 10 -------
 master_data = master_data %>% subset(Turbine == "Turbine 10")
 RNGkind(sample.kind = "default")
 set.seed(2291352)
 train.idx = sample(x=1:nrow(master_data), size = .8*nrow(master_data))
 train.data = master_data[train.idx, ]
 test.data = master_data[-train.idx, ]
+
+## Run This Script Nick!!!! ---------
+rm(list=ls())
+# Import Packages
+library(randomForest)
+library(ggplot2) # For professional exploratory graphics
+library(pROC) #for ROC curves
+library(dplyr)
+library(lubridate)
+
+master_data = read.csv("Project1Data/master_data.csv")
+
+master_data$Is_Fault <- factor(master_data$Is_Fault)
+
+master_data <- na.omit(master_data)
+
+master_data <- master_data %>%
+  mutate_if(sapply(master_data, is.character), as.factor)
+
+master_data$Round_Time = ymd_hms(master_data$Round_Time)
+
+master_data = master_data %>% subset(Turbine == "Turbine 10")
+
+RNGkind(sample.kind = "default")
+set.seed(2291352)
+train.idx = sample(x=1:nrow(master_data), size = .8*nrow(master_data))
+train.data = master_data[train.idx, ]
+test.data = master_data[-train.idx, ]
+
+final_forest = randomForest(Is_Fault ~ Fault_Type + prev_oil_temp + prev_gearbox_temp + prev_active_power +
+                              prev_wind_speed + prev_generator_RPM + prev_active_power + prev_ambient_temp + prev_hydraulic_pressure,
+                            data = train.data,
+                            ntree = 500, # of classification trees in forest
+                            mtry = 7,  # SQRT of 10
+                            importance = TRUE)
+final_forest
+
+pi_hat = predict(final_forest, test.data, type = "prob")[, "1"] # extract prob of positive event
+rocCurve = roc(response = test.data$Is_Fault,
+               predictor = pi_hat,
+               levels = c("0", "1"))
+plot(rocCurve, print.thres = TRUE, print.auc = TRUE)
+
+pi_star = coords(rocCurve, "best", ret = "threshold")$threshold[1]
+pi_star
+
+test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
+# View(test.data)
+
+test.data_sens = test.data %>% subset(Is_Fault == "1" & forest_pred == "0")
+
+write.csv(test.data_sens, "Project1Data/T10_Sens_Forest.csv", row.names = FALSE)
