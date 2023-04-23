@@ -79,8 +79,8 @@ df1 <- df1 %>%
          "Generator_RPM" = "Avg_Value.x.x",
          "Gearbox_Temp" = "Avg_Value.y.y",
          "Active_Power" = "Avg_Value.x.x.x",
-         "Hydraulic_Pressure" = "Avg_Value.y.y.y",
-         "Ambient_Temp" = "Avg_Value")
+         "Ambient_Temp" = "Avg_Value.y.y.y",
+         "Hydraulic_Pressure" = "Avg_Value")
 
 ## DETERMINE Is_Fault and WRITE TO CSV -----
 # corrections to Is_Fault, Fault_Type, and Fault_Description to deal with missing values
