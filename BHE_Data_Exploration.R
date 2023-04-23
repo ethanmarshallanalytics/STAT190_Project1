@@ -19,7 +19,8 @@ library(RColorBrewer)
 ## DATA PREP -------
 # Read in Plotting Data
 plot_data = read.csv("Project1Data/plotting_data.csv")
-a <- read.csv("Project1Data/plotting_data_1.csv")
+a <- read.csv("Project1Data/plot_data_hour.csv")
+b <- read.csv("Project1Data/master_data_hour.csv")
 
 # Read in Clean Data
 clean_data = read.csv("Project1Data/clean_BHE_data.csv")
