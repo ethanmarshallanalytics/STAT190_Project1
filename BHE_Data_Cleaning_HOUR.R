@@ -58,10 +58,6 @@ gearbox <- rbind(g1, g2, g3)
 # join fault code data to other data sets
 df1 <- fc %>% 
   full_join(wind, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
-  full_join(oil_temp, by=c("Round_Time"="Round_Time", "V1"="V1"))
-
-df1 <- fc %>% 
-  full_join(wind, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
   full_join(oil_temp, by=c("Round_Time"="Round_Time", "V1"="V1")) %>% 
   full_join(rpm, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
   full_join(gearbox, by=c("Round_Time"="Round_Time", "V1"="V1")) %>%
@@ -70,17 +66,6 @@ df1 <- fc %>%
   full_join(hp, by=c("Round_Time"="Round_Time", "V1"="V1"))
 
 # rename remaining columns to something meaningful
-df1 <- df1 %>%
-  rename("Turbine" = "V1",
-         "Datetime" = "V2",
-         "Date" = "V3",
-         "Fault_Code" = "V4",
-         "Status" = "V5",
-         "Fault_Description" = "V6",
-         "Fault_Type" = "V7",
-         "Wind_Speed" = "Avg_Value.x",
-         "Oil_Temp" = "Avg_Value.y")
-
 df1 <- df1 %>%
   rename("Turbine" = "V1",
          "Datetime" = "V2",
