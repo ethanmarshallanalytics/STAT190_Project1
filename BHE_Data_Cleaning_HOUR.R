@@ -32,7 +32,18 @@ hp <- read.csv("Project1Data/hydraulic_pressure.csv")
 # convert datetimes and aggregate fault code times
 fc$V2 <- ymd_hms(fc$V2) # change from chr to timestamp
 fc$V3 <- ymd(fc$V3) # change from chr to date
-fc$Round_Time <- round_date(fc$V2, "1 hour")
+
+# tb_first <- fc %>%
+#   group_by(V1, V3, V4) %>%
+#   arrange(V2) %>%
+#   filter(row_number()==1)
+# 
+# tb_last <- fc %>%
+#   group_by(V1, V3, V4) %>%
+#   arrange(desc(V2)) %>%
+#   filter(row_number()==1)
+
+fc$Round_Time <- round_date(fc$V2, "1 hour") # round datetime of fault code to 1 hour
 
 # function to change data types, group on 60 minute intervals, and find average value
 grouping <- function(data){
@@ -165,6 +176,8 @@ df1$Is_Fault <- ifelse(df1$Fault_Description %in%
                            ,"Ups Bypass Error"
                            ,"Ups-Failure"
                            ,"Windspeed Too High To Operate"), 1, 0)
+
+plot_data <- unique(rbind(plot_data, df1), by=c("Turbine", "Round_Time"), fromLast=TRUE)
 
 # write aggregated file to CSV
 write.csv(df1, "Project1Data/plot_data_hour.csv", row.names=F)
