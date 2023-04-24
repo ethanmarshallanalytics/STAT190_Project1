@@ -179,6 +179,19 @@ df1$Is_Fault <- ifelse(df1$Fault_Description %in%
 
 plot_data <- unique(rbind(plot_data, df1), by=c("Turbine", "Round_Time"), fromLast=TRUE)
 
+## Lagging Data (NICK RUN THIS)-----
+df1$Round_Time = ymd_hms(df1$Round_Time)
+
+df1 <- df1 %>%
+  group_by(Turbine) %>%
+  arrange(Round_Time) %>%
+  mutate(Is_Fault_Lag = ifelse(lead(Is_Fault, n = 1) == 1 | 
+                                 lead(Is_Fault, n = 2) == 1 | 
+                                 lead(Is_Fault, n = 3) == 1 | 
+                                 lead(Is_Fault, n = 4) == 1 | 
+                                 lead(Is_Fault, n = 5) == 1 | 
+                                 lead(Is_Fault, n = 6) == 1, 1, 0))
+
 # write aggregated file to CSV
 write.csv(df1, "Project1Data/plot_data_hour.csv", row.names=F)
 
