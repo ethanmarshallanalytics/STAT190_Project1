@@ -12,26 +12,32 @@ library(foreach)
 library(doParallel)
 library(lubridate)
 
-master_data = read.csv("Project1Data/master_data.csv")
+master_data_1 = read.csv("Project1Data/master_data_hour.csv")
 
-master_data$Is_Fault <- factor(master_data$Is_Fault)
+RF_data <- master_data_1 %>% 
+  select(Turbine, Round_Time, Fault_Type, Is_Fault, Is_Fault_Lag, 
+         Oil_Temp_inter, Generator_RPM_inter, Gearbox_Temp_inter, 
+         Active_Power_inter, Ambient_Temp_inter, Hydraulic_Pressure_inter)
 
-master_data <- na.omit(master_data)
+RF_data$Is_Fault <- factor(RF_data$Is_Fault)
+RF_data$Is_Fault_Lag <- factor(RF_data$Is_Fault_Lag)
 
-master_data <- master_data %>%
+RF_data <- na.omit(RF_data)
+
+RF_data <- RF_data %>%
   mutate_if(sapply(master_data, is.character), as.factor)
 
-master_data$Round_Time = ymd_hms(master_data$Round_Time)
+#master_data$Round_Time = ymd_hms(master_data$Round_Time)
 
 RNGkind(sample.kind = "default")
 set.seed(2291352)
-train.idx = sample(x=1:nrow(master_data), size = .7*nrow(master_data))
+train.idx = sample(x=1:nrow(RF_data), size = .7*nrow(RF_data))
 train.data = master_data[train.idx, ]
 test.data = master_data[-train.idx, ]
 
 ## Baseline Forrest ------------------
-myforest = randomForest(Is_Fault ~ Turbine + Fault_Type + prev_oil_temp + prev_gearbox_temp + prev_active_power +
-                          prev_wind_speed + prev_generator_RPM + prev_active_power + prev_ambient_temp + prev_hydraulic_pressure,
+myforest = randomForest(Is_Fault_Lag ~ Turbine + Fault_Type + Oil_Temp_inter + Generator_RPM_inter +
+                          Gearbox_Temp_inter + Active_Power_inter + Ambient_Temp_inter + Hydraulic_Pressure_inter,
                         data = train.data,
                         ntree = 500, # of classification trees in forest
                         mtry = 3,  # SQRT of 12
