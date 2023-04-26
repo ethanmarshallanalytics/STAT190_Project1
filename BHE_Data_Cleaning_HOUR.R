@@ -8,6 +8,8 @@ library(lubridate)
 library(naniar)
 library(imputeTS)
 
+df1 = read.csv("Project1Data/plot_data_hour.csv")
+
 ## ORIGINAL DATA -------
 # read in windspeed.csv
 wind <- read.csv("Project1Data/windspeed.csv")
@@ -32,17 +34,6 @@ hp <- read.csv("Project1Data/hydraulic_pressure.csv")
 # convert datetimes and aggregate fault code times
 fc$V2 <- ymd_hms(fc$V2) # change from chr to timestamp
 fc$V3 <- ymd(fc$V3) # change from chr to date
-
-# tb_first <- fc %>%
-#   group_by(V1, V3, V4) %>%
-#   arrange(V2) %>%
-#   filter(row_number()==1)
-# 
-# tb_last <- fc %>%
-#   group_by(V1, V3, V4) %>%
-#   arrange(desc(V2)) %>%
-#   filter(row_number()==1)
-
 fc$Round_Time <- round_date(fc$V2, "1 hour") # round datetime of fault code to 1 hour
 
 # function to change data types, group on 60 minute intervals, and find average value
@@ -181,6 +172,7 @@ plot_data <- unique(rbind(plot_data, df1), by=c("Turbine", "Round_Time"), fromLa
 
 ## Lagging Data (NICK RUN THIS)-----
 df1$Round_Time = ymd_hms(df1$Round_Time)
+df1$Datetime = ymd_hms(df1$Datetime)
 
 df1 <- df1 %>%
   group_by(Turbine) %>%
@@ -191,6 +183,28 @@ df1 <- df1 %>%
                                  lead(Is_Fault, n = 4) == 1 | 
                                  lead(Is_Fault, n = 5) == 1 | 
                                  lead(Is_Fault, n = 6) == 1, 1, 0))
+
+## Select unique Turbine and Round_Time entries (ETHAN RUN THIS to the end) ----
+df1 = read.csv("Project1Data/plot_data_hour.csv")
+
+df1$Round_Time = ymd_hms(df1$Round_Time)
+df1$Datetime = ymd_hms(df1$Datetime)
+
+df1 <- df1 %>%
+  group_by(Turbine) %>%
+  arrange(Round_Time) %>%
+  mutate(Is_Fault_Lag = ifelse(lead(Is_Fault, n = 1) == 1 | 
+                                 lead(Is_Fault, n = 2) == 1 | 
+                                 lead(Is_Fault, n = 3) == 1 | 
+                                 lead(Is_Fault, n = 4) == 1 | 
+                                 lead(Is_Fault, n = 5) == 1 | 
+                                 lead(Is_Fault, n = 6) == 1, 1, 0))
+
+df1 <- df1 %>% 
+  arrange(Datetime) %>%
+  group_by(Turbine, Round_Time) %>%
+  slice(1) %>%
+  ungroup()
 
 # write aggregated file to CSV
 write.csv(df1, "Project1Data/plot_data_hour.csv", row.names=F)
