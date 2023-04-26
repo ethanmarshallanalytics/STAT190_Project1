@@ -177,3 +177,27 @@ p <- ggpairs(Vars,
   scale_color_manual(values = c("darkgrey", "darkred")) +
   scale_fill_manual(values = c("darkgrey", "darkred"))
 ggplotly(p)
+
+## TIME SERIES INTERPOLATED PLOTS ----
+# load in interpolated data
+plot_data = read.csv("Project1Data/master_data_hour.csv")
+
+# filter data to only include Turbine 7
+# Filter the data to include only dates between March 2020 and May 2020
+data_7 <- plot_data %>% 
+  filter(Turbine == "Turbine 7") %>%
+  filter(Round_Time >= as.Date("2020-02-01") & Round_Time <= as.Date("2020-05-31"))
+
+# change Round_Time to datetime format
+data_7$Round_Time = ymd_hms(data_7$Round_Time)
+
+# Gearbox Temp time series plot
+ggplot(data_7, aes(x = Round_Time)) +
+  # Add the first y variable as a line
+  geom_line(aes(y = Avg_Gearbox_Temp), color = "black") +
+  # Add points where Gearbox_Temp is null
+  geom_point(aes(y = ifelse(is.na(Avg_Gearbox_Temp), Avg_Gearbox_Temp_inter, NA)), color = "red") +
+  # Set the y-axis label and legend
+  labs(x = "Round Time (March 2020 - May 2020)", y = "Gearbox Temperature (ºC)") +
+  ggtitle("Gearbox Temperature Sensor Data") +
+  theme_bw()

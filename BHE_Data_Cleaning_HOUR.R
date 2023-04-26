@@ -8,7 +8,7 @@ library(lubridate)
 library(naniar)
 library(imputeTS)
 
-df1 = read.csv("Project1Data/plot_data_hour.csv")
+# df1 = read.csv("Project1Data/plot_data_hour.csv")
 
 ## ORIGINAL DATA -------
 # read in windspeed.csv
@@ -36,11 +36,13 @@ fc$V2 <- ymd_hms(fc$V2) # change from chr to timestamp
 fc$V3 <- ymd(fc$V3) # change from chr to date
 fc$Round_Time <- round_date(fc$V2, "1 hour") # round datetime of fault code to 1 hour
 
-# function to change data types, group on 60 minute intervals, and find average value
+# function to change data types, group on 60 minute intervals, and find average value, minimum value, maximum value
 grouping <- function(data){
   data$V2 <- ymd_hms(data$V2)
   data$Round_Time <- round_date(data$V2, "1 hour")
-  data <- data %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(V4, na.rm=TRUE))
+  data <- data %>% group_by(V1, Round_Time) %>% summarise(Avg_Value = mean(V4, na.rm=TRUE),
+                                                          Min_Value = min(V4, na.rm=TRUE),
+                                                          Max_Value = max(V4, na.rm=TRUE))
 }
 
 # call functions on each dataset
@@ -76,13 +78,27 @@ df1 <- df1 %>%
          "Status" = "V5",
          "Fault_Description" = "V6",
          "Fault_Type" = "V7",
-         "Wind_Speed" = "Avg_Value.x",
-         "Oil_Temp" = "Avg_Value.y",
-         "Generator_RPM" = "Avg_Value.x.x",
-         "Gearbox_Temp" = "Avg_Value.y.y",
-         "Active_Power" = "Avg_Value.x.x.x",
-         "Ambient_Temp" = "Avg_Value.y.y.y",
-         "Hydraulic_Pressure" = "Avg_Value")
+         "Avg_Wind_Speed" = "Avg_Value.x",
+         "Min_Wind_Speed" = "Min_Value.x",
+         "Max_Wind_Speed" = "Max_Value.x",
+         "Avg_Oil_Temp" = "Avg_Value.y",
+         "Min_Oil_Temp" = "Min_Value.y",
+         "Max_Oil_Temp" = "Max_Value.y",
+         "Avg_Generator_RPM" = "Avg_Value.x.x",
+         "Min_Generator_RPM" = "Min_Value.x.x",
+         "Max_Generator_RPM" = "Max_Value.x.x",
+         "Avg_Gearbox_Temp" = "Avg_Value.y.y",
+         "Min_Gearbox_Temp" = "Min_Value.y.y",
+         "Max_Gearbox_Temp" = "Max_Value.y.y",
+         "Avg_Active_Power" = "Avg_Value.x.x.x",
+         "Min_Active_Power" = "Min_Value.x.x.x",
+         "Max_Active_Power" = "Max_Value.x.x.x",
+         "Avg_Ambient_Temp" = "Avg_Value.y.y.y",
+         "Min_Ambient_Temp" = "Min_Value.y.y.y",
+         "Max_Ambient_Temp" = "Max_Value.y.y.y",
+         "Avg_Hydraulic_Pressure" = "Avg_Value",
+         "Min_Hydraulic_Pressure" = "Min_Value",
+         "Max_Hydraulic_Pressure" = "Max_Value")
 
 ## DETERMINE Is_Fault and WRITE TO CSV -----
 # corrections to Is_Fault, Fault_Type, and Fault_Description to deal with missing values
@@ -168,12 +184,28 @@ df1$Is_Fault <- ifelse(df1$Fault_Description %in%
                            ,"Ups-Failure"
                            ,"Windspeed Too High To Operate"), 1, 0)
 
-plot_data <- unique(rbind(plot_data, df1), by=c("Turbine", "Round_Time"), fromLast=TRUE)
-
 ## Lagging Data (NICK RUN THIS)-----
+# df1$Round_Time = ymd_hms(df1$Round_Time)
+# df1$Datetime = ymd_hms(df1$Datetime)
+# 
+# df1 <- df1 %>%
+#   group_by(Turbine) %>%
+#   arrange(Round_Time) %>%
+#   mutate(Is_Fault_Lag = ifelse(lead(Is_Fault, n = 1) == 1 | 
+#                                  lead(Is_Fault, n = 2) == 1 | 
+#                                  lead(Is_Fault, n = 3) == 1 | 
+#                                  lead(Is_Fault, n = 4) == 1 | 
+#                                  lead(Is_Fault, n = 5) == 1 | 
+#                                  lead(Is_Fault, n = 6) == 1, 1, 0))
+
+## Lag data 6 hours and Select unique Turbine and Round_Time entries ----
+# df1 = read.csv("Project1Data/plot_data_hour.csv")
+
+# convert to datetime formats
 df1$Round_Time = ymd_hms(df1$Round_Time)
 df1$Datetime = ymd_hms(df1$Datetime)
 
+# lag data 6 hours
 df1 <- df1 %>%
   group_by(Turbine) %>%
   arrange(Round_Time) %>%
@@ -184,22 +216,7 @@ df1 <- df1 %>%
                                  lead(Is_Fault, n = 5) == 1 | 
                                  lead(Is_Fault, n = 6) == 1, 1, 0))
 
-## Select unique Turbine and Round_Time entries (ETHAN RUN THIS to the end) ----
-df1 = read.csv("Project1Data/plot_data_hour.csv")
-
-df1$Round_Time = ymd_hms(df1$Round_Time)
-df1$Datetime = ymd_hms(df1$Datetime)
-
-df1 <- df1 %>%
-  group_by(Turbine) %>%
-  arrange(Round_Time) %>%
-  mutate(Is_Fault_Lag = ifelse(lead(Is_Fault, n = 1) == 1 | 
-                                 lead(Is_Fault, n = 2) == 1 | 
-                                 lead(Is_Fault, n = 3) == 1 | 
-                                 lead(Is_Fault, n = 4) == 1 | 
-                                 lead(Is_Fault, n = 5) == 1 | 
-                                 lead(Is_Fault, n = 6) == 1, 1, 0))
-
+# select unique entries
 df1 <- df1 %>% 
   arrange(Datetime) %>%
   group_by(Turbine, Round_Time) %>%
@@ -212,11 +229,28 @@ write.csv(df1, "Project1Data/plot_data_hour.csv", row.names=F)
 ## INTERPOLATE MISSING VALUES FOR ML MODEL ------
 master_data = df1
 
-master_data$Oil_Temp_inter = na_interpolation(master_data$Oil_Temp)
-master_data$Generator_RPM_inter = na_interpolation(master_data$Generator_RPM)
-master_data$Gearbox_Temp_inter = na_interpolation(master_data$Gearbox_Temp)
-master_data$Active_Power_inter = na_interpolation(master_data$Active_Power)
-master_data$Ambient_Temp_inter = na_interpolation(master_data$Ambient_Temp)
-master_data$Hydraulic_Pressure_inter = na_interpolation(master_data$Hydraulic_Pressure)
+master_data$Avg_Oil_Temp_inter = na_interpolation(master_data$Avg_Oil_Temp)
+master_data$Min_Oil_Temp_inter = na_interpolation(master_data$Min_Oil_Temp)
+master_data$Max_Oil_Temp_inter = na_interpolation(master_data$Max_Oil_Temp)
+
+master_data$Avg_Generator_RPM_inter = na_interpolation(master_data$Avg_Generator_RPM)
+master_data$Min_Generator_RPM_inter = na_interpolation(master_data$Min_Generator_RPM)
+master_data$Max_Generator_RPM_inter = na_interpolation(master_data$Max_Generator_RPM)
+
+master_data$Avg_Gearbox_Temp_inter = na_interpolation(master_data$Avg_Gearbox_Temp)
+master_data$Min_Gearbox_Temp_inter = na_interpolation(master_data$Min_Gearbox_Temp)
+master_data$Max_Gearbox_Temp_inter = na_interpolation(master_data$Max_Gearbox_Temp)
+
+master_data$Avg_Active_Power_inter = na_interpolation(master_data$Avg_Active_Power)
+master_data$Min_Active_Power_inter = na_interpolation(master_data$Min_Active_Power)
+master_data$Max_Active_Power_inter = na_interpolation(master_data$Max_Active_Power)
+
+master_data$Avg_Ambient_Temp_inter = na_interpolation(master_data$Avg_Ambient_Temp)
+master_data$Min_Ambient_Temp_inter = na_interpolation(master_data$Min_Ambient_Temp)
+master_data$Max_Ambient_Temp_inter = na_interpolation(master_data$Max_Ambient_Temp)
+
+master_data$Avg_Hydraulic_Pressure_inter = na_interpolation(master_data$Avg_Hydraulic_Pressure)
+master_data$Min_Hydraulic_Pressure_inter = na_interpolation(master_data$Min_Hydraulic_Pressure)
+master_data$Max_Hydraulic_Pressure_inter = na_interpolation(master_data$Max_Hydraulic_Pressure)
 
 write.csv(master_data, "Project1Data/master_data_hour.csv", row.names=F)
