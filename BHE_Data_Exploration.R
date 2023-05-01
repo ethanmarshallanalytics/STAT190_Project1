@@ -318,7 +318,7 @@ u_phase <- subset(data_7, Fault_Description == "Geninv: 139 U-Phase Sharing")
 # water_temp <- subset(data_14, Fault_Description == "Inv. Cooling Water Temp Warning")
 
 # Active Power and Generator RPM
-ggplot(data=subset(u_phase, Active_Power<2000 & Generator_RPM<1400 & Generator_RPM >=100), aes(x=Generator_RPM, y=Active_Power)) +
+ggplot(data=subset(u_phase, Avg_Active_Power<2000 & Avg_Generator_RPM<1400 & Avg_Generator_RPM >=100), aes(x=Avg_Generator_RPM, y=Avg_Active_Power)) +
   geom_point(color="darkred") +
   labs(x = "Generator RPM", y = "Active Power (kW)") +
   ggtitle("Active Power vs. Generator RPM U-Phase Faults") +
@@ -326,7 +326,7 @@ ggplot(data=subset(u_phase, Active_Power<2000 & Generator_RPM<1400 & Generator_R
   theme_bw()
 
 # Gearbox Temperature and Generator RPM
-ggplot(data=subset(u_phase, Generator_RPM<1400 & Generator_RPM>=100), aes(x=Generator_RPM, y=Gearbox_Temp)) +
+ggplot(data=subset(u_phase, Avg_Generator_RPM<1400 & Avg_Generator_RPM>=100), aes(x=Avg_Generator_RPM, y=Avg_Gearbox_Temp)) +
   geom_point(color="darkred") +
   labs(x = "Generator RPM", y = "Gearbox Temperature (ºC)") +
   ggtitle("Gearbox Temperature vs. Generator RPM U-Phase Faults") +
@@ -345,17 +345,4 @@ ggplot(data=subset(u_phase, Generator_RPM<1400 & Generator_RPM>=100), aes(x=Gene
 
 ## HEATMAP RESOURCE
 # https://tidyverse.github.io/ggplot2-docs/reference/geom_bin2d.html
-
-
-## NEXT PROGRESS REPORT
-# Look at if a fault occurred within the next week (new column)
-  # if is_fault = 1 within 7 days from specific starting point
-  # numeric variable for days until next fault code occurs
-
-# Plots grouped on **fault type**
-  # UPDATE aggregate code to show fault type (not fault description)
-  # other code grouped on day, time, fault type
-  # facet on Is_Fault with vertical line for where changes in the data occur
-
-# Look at missing values in clean_data to impute new values
 
