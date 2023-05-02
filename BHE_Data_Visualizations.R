@@ -145,38 +145,44 @@ ggplot(data=subset(u_phase, Avg_Generator_RPM<1400 & Avg_Generator_RPM>=100), ae
   theme_bw()
 
 ## SENSITIVITY PLOTS ------
-# load in data
-t10_sens = read.csv("Project1Data/T10_Sens_Forest.csv")
+# load in data - Lag1_Pred0
+sens = read.csv("Project1Data/Lag1_Pred0.csv")
+summary(sens) # N=620
 
-summary(t10_sens)
+## FAULT TYPE ISN'T LAGGED ... DO WE STILL INCLUDE?
+# bar chart grouped by Fault_Type
+ggplot(data = sens, aes(x = Fault_Type)) +
+  geom_bar(fill="grey", color="black", size=0.5) +
+  labs(title = "Sensitivity Analysis -- Fault Type Distribution", x = "Fault Type", y = "Count") +
+  theme_bw()
 
 # scatter plot matrix
-Vars = data.frame(t10_sens$Oil_Temp,
-                  t10_sens$Generator_RPM,
-                  t10_sens$Wind_Speed,
-                  t10_sens$Gearbox_Temp,
-                  t10_sens$Active_Power,
-                  t10_sens$Ambient_Temp,
-                  t10_sens$Hydraulic_Pressure)
-
-Vars <- Vars %>%
-  rename("Oil_Temp" = "t10_sens.Oil_Temp", 
-         "Generator_RPM" = "t10_sens.Generator_RPM",
-         "Wind_Speed" = "t10_sens.Wind_Speed",
-         "Gearbox_Temp" = "t10_sens.Gearbox_Temp", 
-         "Active_Power" = "t10_sens.Active_Power", 
-         "Ambient_Temp" = "t10_sens.Ambient_Temp",
-         "Hydraulic_Pressure" = "t10_sens.Hydraulic_Pressure")
-         
-## Correlation Matrix
-cor(cbind(Vars), use="pairwise.complete.obs")
-
-## Scatter plot matrix
-p <- ggpairs(Vars, 
-             columns = 1:7) +
-  scale_color_manual(values = c("darkgrey", "darkred")) +
-  scale_fill_manual(values = c("darkgrey", "darkred"))
-ggplotly(p)
+# Vars = data.frame(t10_sens$Oil_Temp,
+#                   t10_sens$Generator_RPM,
+#                   t10_sens$Wind_Speed,
+#                   t10_sens$Gearbox_Temp,
+#                   t10_sens$Active_Power,
+#                   t10_sens$Ambient_Temp,
+#                   t10_sens$Hydraulic_Pressure)
+# 
+# Vars <- Vars %>%
+#   rename("Oil_Temp" = "t10_sens.Oil_Temp", 
+#          "Generator_RPM" = "t10_sens.Generator_RPM",
+#          "Wind_Speed" = "t10_sens.Wind_Speed",
+#          "Gearbox_Temp" = "t10_sens.Gearbox_Temp", 
+#          "Active_Power" = "t10_sens.Active_Power", 
+#          "Ambient_Temp" = "t10_sens.Ambient_Temp",
+#          "Hydraulic_Pressure" = "t10_sens.Hydraulic_Pressure")
+#          
+# ## Correlation Matrix
+# cor(cbind(Vars), use="pairwise.complete.obs")
+# 
+# ## Scatter plot matrix
+# p <- ggpairs(Vars, 
+#              columns = 1:7) +
+#   scale_color_manual(values = c("darkgrey", "darkred")) +
+#   scale_fill_manual(values = c("darkgrey", "darkred"))
+# ggplotly(p)
 
 ## TIME SERIES INTERPOLATED PLOTS ----
 # load in interpolated data
