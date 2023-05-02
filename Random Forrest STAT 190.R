@@ -103,8 +103,8 @@ final_forest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_int
                               Min_Active_Power_inter + Max_Active_Power_inter + Avg_Ambient_Temp_inter + Min_Ambient_Temp_inter +
                               Max_Ambient_Temp_inter + Avg_Hydraulic_Pressure_inter + Min_Hydraulic_Pressure_inter + Max_Hydraulic_Pressure_inter,
                             data = train.data,
-                            ntree = 500, # of classification trees in forest
-                            mtry = 8,  # SQRT of 10
+                            ntree = 500,
+                            mtry = 8, 
                             importance = TRUE)
 final_forest
 
@@ -122,8 +122,9 @@ pi_star
 test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
 View(test.data)
 
-test.data_sens = test.data %>% subset(Is_Fault == "1" & forest_pred == "0")
+test_lag1_pred0 = test.data %>% subset(Is_Fault_Lag == "1" & forest_pred == "0")
+test_lag0_pred1 = test.data %>% subset(Is_Fault_Lag == "0" & forest_pred == "1")
 
-write.csv(test.data_sens, "Project1Data/T10_Sens_Forest.csv", row.names = FALSE)
-
+write.csv(test_lag1_pred0, "Project1Data/Lag1_Pred0.csv", row.names = FALSE)
+write.csv(test_lag0_pred1, "Project1Data/Lag0_Pred1.csv", row.names = FALSE)
 
