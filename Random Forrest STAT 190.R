@@ -12,34 +12,40 @@ library(foreach)
 library(doParallel)
 library(lubridate)
 
-master_data_1 = read.csv("Project1Data/master_data_hour.csv")
+master_data = read.csv("Project1Data/master_data_hour.csv")
 
-RF_data <- master_data_1 %>% 
-  select(Turbine, Round_Time, Fault_Type, Is_Fault, Is_Fault_Lag, 
-         Oil_Temp_inter, Generator_RPM_inter, Gearbox_Temp_inter, 
-         Active_Power_inter, Ambient_Temp_inter, Hydraulic_Pressure_inter)
+master_data$Is_Fault_Lag <- factor(master_data$Is_Fault_Lag)
 
-RF_data$Is_Fault <- factor(RF_data$Is_Fault)
+master_data <- na.omit(master_data)
+
+## Sub-setting Master to variables we need (WHOLE DATA) -------
+RF_data <- master_data %>% 
+  select(Is_Fault_Lag, Fault_Type, Avg_Oil_Temp_inter, Min_Oil_Temp_inter,
+         Max_Oil_Temp_inter, Avg_Generator_RPM_inter, Min_Generator_RPM_inter, Max_Generator_RPM_inter, 
+         Avg_Gearbox_Temp_inter, Min_Gearbox_Temp_inter, Max_Gearbox_Temp_inter, Avg_Active_Power_inter,
+         Min_Active_Power_inter, Max_Active_Power_inter, Avg_Ambient_Temp_inter, Min_Ambient_Temp_inter,
+         Max_Ambient_Temp_inter, Avg_Hydraulic_Pressure_inter, Min_Hydraulic_Pressure_inter, Max_Hydraulic_Pressure_inter)
+
 RF_data$Is_Fault_Lag <- factor(RF_data$Is_Fault_Lag)
 
 RF_data <- na.omit(RF_data)
 
-RF_data <- RF_data %>%
-  mutate_if(sapply(master_data, is.character), as.factor)
+#RF_data <- RF_data %>%
+#  mutate_if(sapply(master_data, is.character), as.factor)
 
 #master_data$Round_Time = ymd_hms(master_data$Round_Time)
 
 RNGkind(sample.kind = "default")
 set.seed(2291352)
-train.idx = sample(x=1:nrow(RF_data), size = .7*nrow(RF_data))
-train.data = master_data[train.idx, ]
-test.data = master_data[-train.idx, ]
+train.idx = sample(x=1:nrow(RF_data), size = .8*nrow(RF_data))
+train.data = RF_data[train.idx, ]
+test.data = RF_data[-train.idx, ]
 
 ## Baseline Forrest ------------------
 myforest = randomForest(Is_Fault_Lag ~ Turbine + Fault_Type + Oil_Temp_inter + Generator_RPM_inter +
                           Gearbox_Temp_inter + Active_Power_inter + Ambient_Temp_inter + Hydraulic_Pressure_inter,
                         data = train.data,
-                        ntree = 500, # of classification trees in forest
+                        ntree = 200, # of classification trees in forest
                         mtry = 3,  # SQRT of 12
                         importance = TRUE)
 myforest
@@ -50,7 +56,7 @@ myforest
 # tune m actually is important and can affect model performance
 
 # create a sequence of m values we want to try
-mtry = c(7:9) # This can only be the number of x variables
+mtry = c(1:18) # This can only be the number of x variables
 
 #note: you can do each possible number if you have time if you are computationally limited,
 #   see the notes on page 28 for how to choose a more limited list.
@@ -68,17 +74,22 @@ keeps = data.frame(m = rep(NA, length(mtry)),
 # create a loop that will fill the keeps data frame
 for(idx in 1:length(mtry)){
   print(paste("Fitting m = ", mtry[idx])) # print out what iteration we are on
-  tempforest = randomForest(Is_Fault ~ Fault_Type + prev_oil_temp + prev_gearbox_temp + prev_active_power +
-                              prev_wind_speed + prev_generator_RPM + prev_active_power + prev_ambient_temp + prev_hydraulic_pressure,
+  tempforest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_inter + Max_Oil_Temp_inter + 
+                            Avg_Generator_RPM_inter + Min_Generator_RPM_inter + Max_Generator_RPM_inter + 
+                            Avg_Gearbox_Temp_inter + Min_Gearbox_Temp_inter + Max_Gearbox_Temp_inter + 
+                            Avg_Active_Power_inter + Min_Active_Power_inter + Max_Active_Power_inter + 
+                            Avg_Ambient_Temp_inter + Min_Ambient_Temp_inter + Max_Ambient_Temp_inter + 
+                              Avg_Hydraulic_Pressure_inter + Min_Hydraulic_Pressure_inter + Max_Hydraulic_Pressure_inter,
                             data = train.data,
                             ntree = 500,
                             mtry = mtry[idx])
   keeps[idx, "m"] = mtry[idx]
-  keeps[idx, "OOB_error_rate"] = mean(predict(tempforest) != train.data$Is_Fault)
+  keeps[idx, "OOB_error_rate"] = mean(predict(tempforest) != train.data$Is_Fault_Lag)
   
   
 }
 keeps
+
 
 #plot the OOB error rate vs m
 ggplot(data = keeps) +
@@ -86,11 +97,14 @@ ggplot(data = keeps) +
 
 
 #Final Forest
-final_forest = randomForest(Is_Fault ~ Fault_Type + prev_oil_temp + prev_gearbox_temp + prev_active_power +
-                              prev_wind_speed + prev_generator_RPM + prev_active_power + prev_ambient_temp + prev_hydraulic_pressure,
+final_forest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_inter +
+                              Max_Oil_Temp_inter + Avg_Gearbox_Temp_inter + Min_Generator_RPM_inter + Max_Generator_RPM_inter + 
+                              Avg_Gearbox_Temp_inter + Min_Gearbox_Temp_inter + Max_Gearbox_Temp_inter + Avg_Active_Power_inter +
+                              Min_Active_Power_inter + Max_Active_Power_inter + Avg_Ambient_Temp_inter + Min_Ambient_Temp_inter +
+                              Max_Ambient_Temp_inter + Avg_Hydraulic_Pressure_inter + Min_Hydraulic_Pressure_inter + Max_Hydraulic_Pressure_inter,
                             data = train.data,
                             ntree = 500, # of classification trees in forest
-                            mtry = 7,  # SQRT of 10
+                            mtry = 8,  # SQRT of 10
                             importance = TRUE)
 final_forest
 
@@ -106,94 +120,10 @@ pi_star = coords(rocCurve, "best", ret = "threshold")$threshold[1]
 pi_star
 
 test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
-# View(test.data)
+View(test.data)
 
 test.data_sens = test.data %>% subset(Is_Fault == "1" & forest_pred == "0")
 
 write.csv(test.data_sens, "Project1Data/T10_Sens_Forest.csv", row.names = FALSE)
 
 
-## foreach package ------
-cl = makeCluster(4) # Setting up a cluster with 3 machines
-registerDoParallel(cl)
-
-inputs = master_data[,c(1,8,10,12,14,16,18,20,22)]
-outputs = master_data[,23]
-
-rf <- foreach(ntree=rep(500, 4), .combine = combine, .packages='randomForest') %dopar% {
-  randomForest(x=inputs, y=outputs, ntree=ntree, mtry=3)
-}
-
-## Ranger package ----
-library(ranger)
-RNGkind(sample.kind = "default")
-set.seed(2291352)
-train.idx = sample(x=1:nrow(master_data), size = .7*nrow(master_data))
-train.data = master_data[train.idx, ]
-test.data = master_data[-train.idx, ]
-
-inputs = master_data[,c(1,8,10,12,14,16,18,20,22)]
-outputs = master_data[,23]
-
-ranger_model <- ranger(formula = as.formula(paste(outputs, "~", paste(inputs, collapse = "+"))), 
-                   data = train.data)
-
-## Turbine 10 -------
-master_data = master_data %>% subset(Turbine == "Turbine 10")
-RNGkind(sample.kind = "default")
-set.seed(2291352)
-train.idx = sample(x=1:nrow(master_data), size = .8*nrow(master_data))
-train.data = master_data[train.idx, ]
-test.data = master_data[-train.idx, ]
-
-## Run This Script Nick!!!! ---------
-rm(list=ls())
-# Import Packages
-library(randomForest)
-library(ggplot2) # For professional exploratory graphics
-library(pROC) #for ROC curves
-library(dplyr)
-library(lubridate)
-
-master_data = read.csv("Project1Data/master_data.csv")
-
-master_data$Is_Fault <- factor(master_data$Is_Fault)
-
-master_data <- na.omit(master_data)
-
-master_data <- master_data %>%
-  mutate_if(sapply(master_data, is.character), as.factor)
-
-master_data$Round_Time = ymd_hms(master_data$Round_Time)
-
-master_data = master_data %>% subset(Turbine == "Turbine 10")
-
-RNGkind(sample.kind = "default")
-set.seed(2291352)
-train.idx = sample(x=1:nrow(master_data), size = .8*nrow(master_data))
-train.data = master_data[train.idx, ]
-test.data = master_data[-train.idx, ]
-
-final_forest = randomForest(Is_Fault ~ Fault_Type + prev_oil_temp + prev_gearbox_temp + prev_active_power +
-                              prev_wind_speed + prev_generator_RPM + prev_active_power + prev_ambient_temp + prev_hydraulic_pressure,
-                            data = train.data,
-                            ntree = 500, # of classification trees in forest
-                            mtry = 7,  # SQRT of 10
-                            importance = TRUE)
-final_forest
-
-pi_hat = predict(final_forest, test.data, type = "prob")[, "1"] # extract prob of positive event
-rocCurve = roc(response = test.data$Is_Fault,
-               predictor = pi_hat,
-               levels = c("0", "1"))
-plot(rocCurve, print.thres = TRUE, print.auc = TRUE)
-
-pi_star = coords(rocCurve, "best", ret = "threshold")$threshold[1]
-pi_star
-
-test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
-# View(test.data)
-
-test.data_sens = test.data %>% subset(Is_Fault == "1" & forest_pred == "0")
-
-write.csv(test.data_sens, "Project1Data/T10_Sens_Forest.csv", row.names = FALSE)
