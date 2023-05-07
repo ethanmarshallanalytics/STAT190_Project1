@@ -16,16 +16,15 @@ master_data = read.csv("Project1Data/master_data_hour.csv")
 
 master_data$Is_Fault_Lag <- factor(master_data$Is_Fault_Lag)
 
-master_data <- na.omit(master_data)
-
 ## Sub-setting Master to variables we need (WHOLE DATA) -------
 RF_data <- master_data %>% 
-  select(Is_Fault_Lag, Fault_Type, Avg_Oil_Temp_inter, Min_Oil_Temp_inter,
+  select(Is_Fault, Is_Fault_Lag, Turbine, Fault_Type, Avg_Oil_Temp_inter, Min_Oil_Temp_inter,
          Max_Oil_Temp_inter, Avg_Generator_RPM_inter, Min_Generator_RPM_inter, Max_Generator_RPM_inter, 
          Avg_Gearbox_Temp_inter, Min_Gearbox_Temp_inter, Max_Gearbox_Temp_inter, Avg_Active_Power_inter,
          Min_Active_Power_inter, Max_Active_Power_inter, Avg_Ambient_Temp_inter, Min_Ambient_Temp_inter,
          Max_Ambient_Temp_inter, Avg_Hydraulic_Pressure_inter, Min_Hydraulic_Pressure_inter, Max_Hydraulic_Pressure_inter)
 
+RF_data$Is_Fault <- factor(RF_data$Is_Fault)
 RF_data$Is_Fault_Lag <- factor(RF_data$Is_Fault_Lag)
 
 RF_data <- na.omit(RF_data)
@@ -42,13 +41,23 @@ train.data = RF_data[train.idx, ]
 test.data = RF_data[-train.idx, ]
 
 ## Baseline Forrest ------------------
-myforest = randomForest(Is_Fault_Lag ~ Turbine + Fault_Type + Oil_Temp_inter + Generator_RPM_inter +
-                          Gearbox_Temp_inter + Active_Power_inter + Ambient_Temp_inter + Hydraulic_Pressure_inter,
+myforest = randomForest(Is_Fault ~ Turbine + Fault_Type + Avg_Oil_Temp_inter + Avg_Generator_RPM_inter +
+                          Avg_Gearbox_Temp_inter + Avg_Active_Power_inter + Avg_Ambient_Temp_inter + Avg_Hydraulic_Pressure_inter,
                         data = train.data,
                         ntree = 200, # of classification trees in forest
-                        mtry = 3,  # SQRT of 12
+                        mtry = 3,  # SQRT(8)
                         importance = TRUE)
 myforest
+
+# extract prob of positive event
+pi_hat_base = predict(myforest, test.data, type = "prob")[, "1"] 
+
+# plot ROC curve
+rocCurve_base = roc(response = test.data$Is_Fault,
+               predictor = pi_hat_base,
+               levels = c("0", "1")) 
+plot(rocCurve_base, print.thres = TRUE, print.auc = TRUE)
+
 ## TUNING THE FOREST ----
 # Moral of the story: fit as many trees as you have time for
 # You cannot fit based on too many trees
@@ -72,6 +81,7 @@ keeps = data.frame(m = rep(NA, length(mtry)),
 
 
 # create a loop that will fill the keeps data frame
+### DO WE WANT TO PUT TURBINE BACK IN??
 for(idx in 1:length(mtry)){
   print(paste("Fitting m = ", mtry[idx])) # print out what iteration we are on
   tempforest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_inter + Max_Oil_Temp_inter + 
@@ -97,11 +107,12 @@ ggplot(data = keeps) +
 
 
 #Final Forest
-final_forest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_inter +
-                              Max_Oil_Temp_inter + Avg_Gearbox_Temp_inter + Min_Generator_RPM_inter + Max_Generator_RPM_inter + 
-                              Avg_Gearbox_Temp_inter + Min_Gearbox_Temp_inter + Max_Gearbox_Temp_inter + Avg_Active_Power_inter +
-                              Min_Active_Power_inter + Max_Active_Power_inter + Avg_Ambient_Temp_inter + Min_Ambient_Temp_inter +
-                              Max_Ambient_Temp_inter + Avg_Hydraulic_Pressure_inter + Min_Hydraulic_Pressure_inter + Max_Hydraulic_Pressure_inter,
+final_forest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_inter + Max_Oil_Temp_inter + 
+                              Avg_Generator_RPM_inter + Min_Generator_RPM_inter + Max_Generator_RPM_inter + 
+                              Avg_Gearbox_Temp_inter + Min_Gearbox_Temp_inter + Max_Gearbox_Temp_inter + 
+                              Avg_Active_Power_inter + Min_Active_Power_inter + Max_Active_Power_inter + 
+                              Avg_Ambient_Temp_inter + Min_Ambient_Temp_inter + Max_Ambient_Temp_inter + 
+                              Avg_Hydraulic_Pressure_inter + Min_Hydraulic_Pressure_inter + Max_Hydraulic_Pressure_inter,
                             data = train.data,
                             ntree = 500,
                             mtry = 8, 
@@ -110,11 +121,11 @@ final_forest
 
 
 ## Results ------
-pi_hat = predict(final_forest, test.data, type = "prob")[, "1"] # extract prob of positive event
-rocCurve = roc(response = test.data$Is_Fault,
-               predictor = pi_hat,
+pi_hat_final = predict(final_forest, test.data, type = "prob")[, "1"] # extract prob of positive event
+rocCurve_final = roc(response = test.data$Is_Fault,
+               predictor = pi_hat_final,
                levels = c("0", "1"))
-plot(rocCurve, print.thres = TRUE, print.auc = TRUE)
+plot(rocCurve_final, print.thres = TRUE, print.auc = TRUE)
 
 pi_star = coords(rocCurve, "best", ret = "threshold")$threshold[1]
 pi_star
@@ -127,4 +138,3 @@ test_lag0_pred1 = test.data %>% subset(Is_Fault_Lag == "0" & forest_pred == "1")
 
 write.csv(test_lag1_pred0, "Project1Data/Lag1_Pred0.csv", row.names = FALSE)
 write.csv(test_lag0_pred1, "Project1Data/Lag0_Pred1.csv", row.names = FALSE)
-

@@ -260,3 +260,31 @@ ggplot(data_7, aes(x = Round_Time)) +
   labs(x = "Round Time (March 2020 - May 2020)", y = "Gearbox Temperature (ºC)") +
   ggtitle("Gearbox Temperature Sensor Data") +
   theme_bw()
+
+## SUMMARY STATISTICS
+model_variables = plot_data %>% select(Avg_Oil_Temp_inter,
+                                        Min_Oil_Temp_inter,
+                                        Max_Oil_Temp_inter,
+                                        Avg_Generator_RPM_inter,
+                                        Min_Generator_RPM_inter,
+                                        Max_Generator_RPM_inter,
+                                        Avg_Gearbox_Temp_inter,
+                                        Min_Gearbox_Temp_inter,
+                                        Max_Gearbox_Temp_inter,
+                                        Avg_Active_Power_inter,
+                                        Min_Active_Power_inter,
+                                        Max_Active_Power_inter,
+                                        Avg_Ambient_Temp_inter,
+                                        Min_Ambient_Temp_inter,
+                                        Max_Ambient_Temp_inter,
+                                        Avg_Hydraulic_Pressure_inter,
+                                        Min_Hydraulic_Pressure_inter,
+                                        Max_Hydraulic_Pressure_inter)
+
+summary(model_variables)
+
+
+
+
+
+
