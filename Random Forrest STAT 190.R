@@ -1,5 +1,4 @@
-## Random Forrest for STAT 190
-
+## Random Forest for STAT 190
 ## Packages and Reading In---------
 
 rm(list=ls())
@@ -58,7 +57,7 @@ rocCurve_base = roc(response = test.data$Is_Fault,
                levels = c("0", "1")) 
 plot(rocCurve_base, print.thres = TRUE, print.auc = TRUE)
 
-## TUNING THE FOREST ----
+## TUNING FOR FINAL FOREST ----
 # Moral of the story: fit as many trees as you have time for
 # You cannot fit based on too many trees
 
@@ -67,21 +66,13 @@ plot(rocCurve_base, print.thres = TRUE, print.auc = TRUE)
 # create a sequence of m values we want to try
 mtry = c(1:18) # This can only be the number of x variables
 
-#note: you can do each possible number if you have time if you are computationally limited,
-#   see the notes on page 28 for how to choose a more limited list.
-
 # make room for m and oob error (empty data frame)
-
 keeps = data.frame(m = rep(NA, length(mtry)),
                    OOB_error_rate = rep(NA, length(mtry)))
 
 # master_data <- head(master_data, 200000)
 
-
-
-
 # create a loop that will fill the keeps data frame
-### DO WE WANT TO PUT TURBINE BACK IN??
 for(idx in 1:length(mtry)){
   print(paste("Fitting m = ", mtry[idx])) # print out what iteration we are on
   tempforest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_inter + Max_Oil_Temp_inter + 
@@ -100,13 +91,12 @@ for(idx in 1:length(mtry)){
 }
 keeps
 
-
 #plot the OOB error rate vs m
 ggplot(data = keeps) +
   geom_line(aes(x = m, y = OOB_error_rate))
 
 
-#Final Forest
+### FINAL FOREST -----
 final_forest = randomForest(Is_Fault_Lag ~ Avg_Oil_Temp_inter + Min_Oil_Temp_inter + Max_Oil_Temp_inter + 
                               Avg_Generator_RPM_inter + Min_Generator_RPM_inter + Max_Generator_RPM_inter + 
                               Avg_Gearbox_Temp_inter + Min_Gearbox_Temp_inter + Max_Gearbox_Temp_inter + 
@@ -127,12 +117,30 @@ rocCurve_final = roc(response = test.data$Is_Fault,
                levels = c("0", "1"))
 plot(rocCurve_final, print.thres = TRUE, print.auc = TRUE)
 
-pi_star = coords(rocCurve, "best", ret = "threshold")$threshold[1]
+pi_star = coords(rocCurve_final, "best", ret = "threshold")$threshold[1]
 pi_star
 
-test.data$forest_pred = as.factor(ifelse(pi_hat > pi_star, "1", "0"))
+# pi* = 0.289
+# Sensitivity = 0.888
+# Specificity = 0.843
+# AUC = 0.939
+
+test.data$forest_pred = as.factor(ifelse(pi_hat_final > pi_star, "1", "0"))
 View(test.data)
 
+## Variable Importance Plot
+vi <- as.data.frame(varImpPlot(final_forest, type=1))
+vi$Variable <- rownames(vi)
+ggplot(data = vi) +
+  geom_bar(aes(x = reorder(Variable,MeanDecreaseAccuracy), 
+               weight = MeanDecreaseAccuracy), 
+           position ="identity", color = "black", fill="darkred") + 
+  coord_flip() +
+  theme_bw() +
+  labs(x = "Variable Name", y = "Importance") +
+  ggtitle("Variable Importance Plot for Predicting Fault Codes")
+
+# sensitivity and specificity datasets
 test_lag1_pred0 = test.data %>% subset(Is_Fault_Lag == "1" & forest_pred == "0")
 test_lag0_pred1 = test.data %>% subset(Is_Fault_Lag == "0" & forest_pred == "1")
 

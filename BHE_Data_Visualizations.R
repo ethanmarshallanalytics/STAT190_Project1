@@ -49,6 +49,16 @@ model_variables = plot_data %>% select(Avg_Oil_Temp_inter,
                                        Max_Hydraulic_Pressure_inter)
 
 summary(model_variables)
+
+# distribution of Is_Fault
+ggplot(data=plot_data, aes(x=Is_Fault, fill="")) +
+  geom_bar() +
+  scale_fill_manual(values = c("darkred")) +
+  labs(y="Count", title="Distribution of Is_Fault") + 
+  scale_y_continuous(breaks=c(15000,30000,45000,60000,75000), limits=c(0,75000)) +
+  theme_bw() +
+  theme(legend.position = "none")
+
 ## SCATTER PLOT MATRIX -------
 # subset to sensor data columns
 Vars = data.frame(data_7_sub$Avg_Oil_Temp, 

@@ -57,7 +57,7 @@ View(wo)
 
 ## UNI- AND MULTI-VARIATE PLOTS ------------
 # further subset Turbine 7 data to only include data since Jan 1, 2022
-data_7_sub <- filter(data_7, Date > "2022-03-01")
+data_7_sub <- filter(data_7, Date > "2022-01-01")
 
 # subset to sensor data columns
 Vars = data.frame(data_7_sub$Oil_Temp, 
@@ -345,4 +345,3 @@ ggplot(data=subset(u_phase, Avg_Generator_RPM<1400 & Avg_Generator_RPM>=100), ae
 
 ## HEATMAP RESOURCE
 # https://tidyverse.github.io/ggplot2-docs/reference/geom_bin2d.html
-

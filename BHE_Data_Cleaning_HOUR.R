@@ -184,20 +184,6 @@ df1$Is_Fault <- ifelse(df1$Fault_Description %in%
                            ,"Ups-Failure"
                            ,"Windspeed Too High To Operate"), 1, 0)
 
-## Lagging Data (NICK RUN THIS)-----
-# df1$Round_Time = ymd_hms(df1$Round_Time)
-# df1$Datetime = ymd_hms(df1$Datetime)
-# 
-# df1 <- df1 %>%
-#   group_by(Turbine) %>%
-#   arrange(Round_Time) %>%
-#   mutate(Is_Fault_Lag = ifelse(lead(Is_Fault, n = 1) == 1 | 
-#                                  lead(Is_Fault, n = 2) == 1 | 
-#                                  lead(Is_Fault, n = 3) == 1 | 
-#                                  lead(Is_Fault, n = 4) == 1 | 
-#                                  lead(Is_Fault, n = 5) == 1 | 
-#                                  lead(Is_Fault, n = 6) == 1, 1, 0))
-
 ## Lag data 6 hours and Select unique Turbine and Round_Time entries ----
 # df1 = read.csv("Project1Data/plot_data_hour.csv")
 
