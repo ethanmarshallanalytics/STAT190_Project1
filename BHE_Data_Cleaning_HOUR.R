@@ -217,6 +217,10 @@ df1 <- df1 %>%
                                  lead(Is_Fault, n = 6) == 1, 1, 0))
 
 # select unique entries
+# arrange data by datetime
+# group by Turbine and Round_Time
+# select the first fault code from that hour
+# ungroup the data
 df1 <- df1 %>% 
   arrange(Datetime) %>%
   group_by(Turbine, Round_Time) %>%
