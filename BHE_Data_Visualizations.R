@@ -233,7 +233,7 @@ ggplot_na_distribution2(plot_data_full$Avg_Oil_Temp, interval_size = 2160,
 ## SENSITIVITY PLOTS ------
 # load in data - Lag1_Pred0
 sens = read.csv("Project1Data/Lag1_Pred0.csv")
-summary(sens) # N=620
+summary(sens) # N=857
 
 # bar chart grouped by Fault_Type
 # ggplot(data = sens, aes(x = Fault_Type)) +
@@ -269,39 +269,39 @@ ggplotly(p)
 ggplot(data = sens, aes(x = Avg_Ambient_Temp_inter)) +
   geom_histogram(binwidth = 1, fill="darkgrey", color="black", size=0.5) +
   labs(title = "Sensitivity Analysis -- Average Ambient Temp Distribution", x = "Ambient Temperature (ºC)", y = "Count") +
-  scale_x_continuous(breaks = c(21,22,23,24,25,26,27,28,29,30,31)) +
-  theme_bw()
-
-ggplot(data = sens, aes(x = Min_Ambient_Temp_inter)) +
-  geom_histogram(binwidth = 1, fill="darkgrey", color="black", size=0.5) +
-  labs(title = "Sensitivity Analysis -- Minimum Ambient Temp Distribution", x = "Ambient Temperature (ºC)", y = "Count") +
-  scale_x_continuous(breaks = c(21,22,23,24,25,26,27,28,29,30,31)) +
-  theme_bw()
-
-ggplot(data = sens, aes(x = Max_Ambient_Temp_inter)) +
-  geom_histogram(binwidth = 1, fill="darkgrey", color="black", size=0.5) +
-  labs(title = "Sensitivity Analysis -- Maximum Ambient Temp Distribution", x = "Ambient Temperature (ºC)", y = "Count") +
   scale_x_continuous(breaks = c(21,22,23,24,25,26,27,28,29,30,31,32,33,34)) +
   theme_bw()
 
-# Oil_Temp
-ggplot(data = sens, aes(x = Avg_Oil_Temp_inter)) +
-  geom_histogram(binwidth=5, fill="red", color="black", size=0.5) +
-  labs(title = "Sensitivity Analysis -- Average Oil Temp Distribution", x = "Oil Temperature (ºC)", y = "Count") +
-  scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200)) +
+# ggplot(data = sens, aes(x = Min_Ambient_Temp_inter)) +
+#   geom_histogram(binwidth = 1, fill="darkgrey", color="black", size=0.5) +
+#   labs(title = "Sensitivity Analysis -- Minimum Ambient Temp Distribution", x = "Ambient Temperature (ºC)", y = "Count") +
+#   scale_x_continuous(breaks = c(21,22,23,24,25,26,27,28,29,30,31)) +
+#   theme_bw()
+# 
+# ggplot(data = sens, aes(x = Max_Ambient_Temp_inter)) +
+#   geom_histogram(binwidth = 1, fill="darkgrey", color="black", size=0.5) +
+#   labs(title = "Sensitivity Analysis -- Maximum Ambient Temp Distribution", x = "Ambient Temperature (ºC)", y = "Count") +
+#   scale_x_continuous(breaks = c(21,22,23,24,25,26,27,28,29,30,31,32,33,34)) +
+#   theme_bw()
+
+# Active_Power
+ggplot(data = sens, aes(x = Avg_Active_Power_inter)) +
+  geom_histogram(binwidth=60, fill="red", color="black", size=0.5) +
+  labs(title = "Sensitivity Analysis -- Average Active Power Distribution", x = "Active Power (kW)", y = "Count") +
+  scale_x_continuous(breaks = c(0,300,600,900,1200,1500,1800,2100,2400)) +
   theme_bw()
 
-ggplot(data = sens, aes(x = Min_Oil_Temp_inter)) +
-  geom_histogram(binwidth=5, fill="red", color="black", size=0.5) +
-  labs(title = "Sensitivity Analysis -- Minimum Oil Temp Distribution", x = "Oil Temperature (ºC)", y = "Count") +
-  scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200)) +
-  theme_bw()
-
-ggplot(data = sens, aes(x = Max_Oil_Temp_inter)) +
-  geom_histogram(binwidth=5, fill="red", color="black", size=0.5) +
-  labs(title = "Sensitivity Analysis -- Maximum Oil Temp Distribution", x = "Oil Temperature (ºC)", y = "Count") +
-  scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200)) +
-  theme_bw()
+# ggplot(data = sens, aes(x = Min_Active_Power_inter)) +
+#   geom_histogram(binwidth=5, fill="red", color="black", size=0.5) +
+#   labs(title = "Sensitivity Analysis -- Minimum Oil Temp Distribution", x = "Oil Temperature (ºC)", y = "Count") +
+#   scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200)) +
+#   theme_bw()
+# 
+# ggplot(data = sens, aes(x = Max_Active_Power_inter)) +
+#   geom_histogram(binwidth=5, fill="red", color="black", size=0.5) +
+#   labs(title = "Sensitivity Analysis -- Maximum Oil Temp Distribution", x = "Oil Temperature (ºC)", y = "Count") +
+#   scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200)) +
+#   theme_bw()
 
 # Hydraulic_Pressure
 ggplot(data = sens, aes(x = Avg_Hydraulic_Pressure_inter)) +
@@ -310,14 +310,14 @@ ggplot(data = sens, aes(x = Avg_Hydraulic_Pressure_inter)) +
   scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200, 225)) +
   theme_bw()
 
-ggplot(data = sens, aes(x = Min_Hydraulic_Pressure_inter)) +
-  geom_histogram(binwidth=5, fill="darkred", color="black", size=0.5) +
-  labs(title = "Sensitivity Analysis -- Minimum Hydraulic Pressure Distribution", x = "Hydraulic Pressure (bar)", y = "Count") +
-  scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200,225)) +
-  theme_bw()
-
-ggplot(data = sens, aes(x = Max_Hydraulic_Pressure_inter)) +
-  geom_histogram(binwidth=5, fill="darkred", color="black", size=0.5) +
-  labs(title = "Sensitivity Analysis -- Maximum Hydraulic Pressure Distribution", x = "Hydraulic Pressure (bar)", y = "Count") +
-  scale_x_continuous(breaks = c(50,75,100,125,150,175,200,225,250)) +
-  theme_bw()
+# ggplot(data = sens, aes(x = Min_Hydraulic_Pressure_inter)) +
+#   geom_histogram(binwidth=5, fill="darkred", color="black", size=0.5) +
+#   labs(title = "Sensitivity Analysis -- Minimum Hydraulic Pressure Distribution", x = "Hydraulic Pressure (bar)", y = "Count") +
+#   scale_x_continuous(breaks = c(25,50,75,100,125,150,175,200,225)) +
+#   theme_bw()
+# 
+# ggplot(data = sens, aes(x = Max_Hydraulic_Pressure_inter)) +
+#   geom_histogram(binwidth=5, fill="darkred", color="black", size=0.5) +
+#   labs(title = "Sensitivity Analysis -- Maximum Hydraulic Pressure Distribution", x = "Hydraulic Pressure (bar)", y = "Count") +
+#   scale_x_continuous(breaks = c(50,75,100,125,150,175,200,225,250)) +
+#   theme_bw()
