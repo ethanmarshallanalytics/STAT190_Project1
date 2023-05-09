@@ -12,7 +12,7 @@ Steps in the Data:
   1. Import raw data
   2. Clean the raw data and join all the data into one dataframe
   3. Build explanatory plots to have a better visual understanding of the data
-  4. Run Forest 1
+  4. Run Baseline Random Forest
   5. Tune Forest
   6. Analyze rocCurve
   8. Build visualizations to analyze results
