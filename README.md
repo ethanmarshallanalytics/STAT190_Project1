@@ -33,4 +33,4 @@ Forest 1 (Untuned): Sensitiity: 80.8% Specificity: 67.2% AUC: 0.798
 
 Forest 2 (Tuned): Sensitiity: 88.8% Specificity: 84.3% AUC: 0.939
 
-Forest 1 was not properly tuned but showed a baseline of how our model would perform. After tuning to minimize OOB error, 500 trees and mtry=8 were used to develop our final model. The results were great, and the numbers indicate that this model can provide Berkshire Hathaway a strong analytical framework for predicting fault codes in the future.
+Forest 1 was not properly tuned but showed a baseline for how our model would perform. After tuning to minimize OOB error, 500 trees and mtry=8 were used to develop our final model. The results were great, and the numbers indicate that this model can provide Berkshire Hathaway a strong analytical framework for predicting fault codes in the future.
